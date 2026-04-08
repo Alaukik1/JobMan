@@ -4,7 +4,7 @@
 #define AppName "JobMan"
 #define AppVersion "1.0.0"
 #define AppPublisher "Digital Architect"
-#define AppURL "https://github.com/Crusader2359/JobMan"
+#define AppURL "https://github.com/Alaukik1/JobMan"
 #define AppExeName "JobMan.exe"
 #define AppId "{{A9C5E2D1-B83F-406A-8B3F-633F20A0282B}"
 
