@@ -1,0 +1,1665 @@
+<!DOCTYPE html>
+<html class="dark" lang="en">
+<head>
+    <meta charset="utf-8"/>
+    <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+    <title>JobMan Platform</title>
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700;900&family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet"/>
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+    <script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "surface": "#131313",
+                        "on-surface": "#e5e2e1",
+                        "primary": "#adc6ff",
+                        "primary-container": "#4d8eff",
+                        "on-primary-container": "#00285d",
+                        "secondary": "#4edea3",
+                        "outline": "#8c909f",
+                        "outline-variant": "#424754",
+                        "surface-container-highest": "#353534",
+                        "surface-container-low": "#1c1b1b",
+                        "surface-container-lowest": "#0e0e0e",
+                    },
+                    fontFamily: {
+                        headline: ["Space Grotesk"],
+                        body: ["Inter"],
+                        mono: ["JetBrains Mono"]
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        .material-symbols-outlined { font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24; }
+        ::-webkit-scrollbar { width: 4px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: #2a2a2a; border-radius: 10px; }
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+        .hidden { display: none !important; }
+        @keyframes slideInFade { 0% { opacity: 0; transform: translateY(10px); } 100% { opacity: 1; transform: translateY(0); } }
+        @keyframes slideUp { 0% { transform: translateY(30px); opacity: 0; } 100% { transform: translateY(0); opacity: 1; } }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        .step-active { animation: slideInFade 0.3s cubic-bezier(0.4, 0, 0.2, 1) forwards; display: block; }
+        .animate-slide-up { animation: slideUp 0.6s cubic-bezier(0.2, 0.8, 0.2, 1) forwards; }
+        .fade-in { animation: fadeIn 0.4s ease-out forwards; }
+        .active-modal-ring { box-shadow: 0 0 0 1px rgba(173, 198, 255, 0.1), 0 20px 50px rgba(0, 0, 0, 0.5); }
+    </style>
+</head>
+<body class="bg-surface text-on-surface font-body selection:bg-primary-container selection:text-on-primary-container overflow-hidden">
+<div class="flex h-screen w-full">
+
+    <!-- Sidebar -->
+    <aside class="flex flex-col h-full py-6 bg-surface-container-low w-64 border-r-0 shadow-none shrink-0 border-r border-[#353534]">
+        <div class="px-6 mb-10 flex items-center gap-3">
+            <div class="w-10 h-10 bg-gradient-to-br from-primary to-primary-container rounded flex items-center justify-center">
+                <span class="material-symbols-outlined text-on-primary-container text-2xl" data-weight="fill">architecture</span>
+            </div>
+            <div>
+                <h1 class="font-headline text-lg font-black text-white">JobMan</h1>
+                <p class="font-headline tracking-tight text-[10px] uppercase font-bold text-outline opacity-70">Premium Terminal</p>
+            </div>
+        </div>
+        <nav class="flex-1 space-y-1 px-3">
+            <button onclick="switchTab('dashboard')" id="btn-dashboard" class="w-full flex items-center gap-3 px-4 py-3 font-headline tracking-tight text-sm uppercase font-bold transition-all bg-[#2a2a2a] text-[#adc6ff] border-l-4 border-[#3B82F6] rounded-r">
+                <span class="material-symbols-outlined">dashboard</span>
+                <span>Dashboard</span>
+            </button>
+            <button onclick="switchTab('config')" id="btn-config" class="w-full flex items-center gap-3 px-4 py-3 font-headline tracking-tight text-sm uppercase font-bold transition-all text-[#a0a0a0] hover:bg-[#201f1f] hover:text-white rounded">
+                <span class="material-symbols-outlined">settings</span>
+                <span>Configuration</span>
+            </button>
+            <button onclick="switchTab('brain')" id="btn-brain" class="w-full flex items-center gap-3 px-4 py-3 font-headline tracking-tight text-sm uppercase font-bold transition-all text-[#a0a0a0] hover:bg-[#201f1f] hover:text-white rounded">
+                <span class="material-symbols-outlined">psychology</span>
+                <span>Brain & Memory</span>
+            </button>
+            <button onclick="switchTab('results')" id="btn-results" class="w-full flex items-center gap-3 px-4 py-3 font-headline tracking-tight text-sm uppercase font-bold transition-all text-[#a0a0a0] hover:bg-[#201f1f] hover:text-white rounded">
+                <span class="material-symbols-outlined">analytics</span>
+                <span>Results</span>
+            </button>
+        </nav>
+    </aside>
+
+    <!-- Main View -->
+    <main class="flex-1 flex flex-col h-full overflow-hidden bg-surface">
+
+        <!-- Top Bar -->
+        <header class="flex justify-between items-center px-8 w-full shrink-0 bg-[#131313]/90 backdrop-blur-xl h-16 border-b border-[#353534]">
+            <div class="flex items-center gap-8">
+                <span class="text-xl font-bold tracking-widest text-white uppercase font-headline">DIGITAL RENAISSANCE</span>
+            </div>
+            <div class="flex items-center gap-6">
+                <div class="flex items-center gap-3 bg-surface-container-lowest px-4 py-1.5 rounded-full border border-outline-variant/10">
+                    <div id="status-dot" class="w-2 h-2 rounded-full bg-outline animate-pulse"></div>
+                    <span class="text-[10px] font-mono text-outline uppercase tracking-tighter">Status:</span>
+                    <span id="system-status" class="text-xs font-bold text-outline uppercase font-headline">Idle</span>
+                </div>
+                <div id="setup-indicator" class="hidden items-center gap-2 bg-primary/10 px-3 py-1 rounded-full border border-primary/20">
+                    <span class="w-1.5 h-1.5 rounded-full bg-primary animate-ping"></span>
+                    <span class="text-[9px] font-bold text-primary uppercase tracking-widest">Setup Required</span>
+                </div>
+            </div>
+        </header>
+
+        <div class="flex-1 overflow-y-auto relative p-8">
+            <!-- ============================================== -->
+            <!-- RESULTS TAB -->
+            <!-- ============================================== -->
+            <section id="tab-results" class="max-w-7xl mx-auto hidden delay-100 ease-in fade-in">
+                <div class="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-6 mb-12">
+                    <div>
+                        <h2 class="text-4xl lg:text-5xl font-black font-headline text-white tracking-tight leading-none mb-4">Results Gallery</h2>
+                        <p class="text-outline max-w-xl font-body leading-relaxed">Job scraping session metrics and identified leads. Filter through identified leads and rejected entries below.</p>
+                    </div>
+                    <div class="flex items-center gap-4 w-full lg:w-auto">
+                        <div class="relative flex-1 lg:w-64">
+                            <input id="input-results-search" oninput="filterResultsTable()" type="text" placeholder="Search leads, companies..." class="w-full bg-surface-container-low border border-white/5 focus:ring-1 focus:ring-primary rounded-3xl py-3 px-5 pl-12 text-white font-mono text-sm transition-all"/>
+                            <span class="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-outline/50">search</span>
+                        </div>
+                        <button onclick="copyResultsPath()" class="bg-secondary text-on-secondary-container px-6 py-3 rounded-3xl font-headline font-bold uppercase text-xs tracking-widest shadow-xl transition-all hover:opacity-90 active:scale-95 flex items-center gap-2">
+                            <span class="material-symbols-outlined text-lg">description</span>
+                            Export All To spreadsheet
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Result File Tabs -->
+                <div class="flex gap-4 mb-8">
+                    <button onclick="switchResultsType('verified')" id="btn-results-v" class="flex items-center gap-3 px-6 py-3 bg-surface-container-low border border-primary rounded-3xl text-primary font-headline font-bold uppercase text-xs tracking-widest transition-all">
+                        <span class="material-symbols-outlined text-sm">verified_user</span>
+                        Jobs-Verified.xlsx
+                        <span id="badge-v-count" class="ml-2 px-2 py-0.5 bg-primary/10 rounded-full text-[10px]">0</span>
+                    </button>
+                    <button onclick="switchResultsType('rejected')" id="btn-results-r" class="flex items-center gap-3 px-6 py-3 bg-surface-container-low border border-white/5 rounded-3xl text-outline font-headline font-bold uppercase text-xs tracking-widest transition-all hover:bg-white/5">
+                        <span class="material-symbols-outlined text-sm">cancel</span>
+                        Jobs-Rejected.xlsx
+                        <span id="badge-r-count" class="ml-2 px-2 py-0.5 bg-white/10 rounded-full text-[10px]">0</span>
+                    </button>
+                </div>
+
+                <div class="space-y-8 mb-12">
+                    <!-- MAIN TABLE AREA -->
+                    <div class="space-y-8">
+                        <div class="bg-surface-container-low rounded-[2.5rem] border border-white/5 overflow-hidden">
+                            <div class="p-8 border-b border-white/5 flex items-center justify-between">
+                                <div class="flex items-center gap-4">
+                                    <div class="w-10 h-10 bg-secondary/10 rounded-2xl flex items-center justify-center border border-secondary/20">
+                                        <span id="results-icon" class="material-symbols-outlined text-secondary text-2xl">fact_check</span>
+                                    </div>
+                                    <div>
+                                        <h3 id="results-title" class="font-headline font-bold text-lg text-white uppercase tracking-tighter">Verified Lead Candidates</h3>
+                                        <p id="results-subtitle" class="text-[10px] text-outline uppercase tracking-widest font-bold">Confidence Interval > 85%</p>
+                                    </div>
+                                </div>
+                                <div class="text-[10px] text-outline uppercase tracking-widest font-bold flex items-center gap-2">
+                                    Sorting: Match Score Descending
+                                    <span class="material-symbols-outlined text-sm">sort</span>
+                                </div>
+                            </div>
+                            
+                            <div class="overflow-x-auto">
+                                <table class="w-full text-left border-collapse min-w-[800px]">
+                                    <thead class="bg-white/[0.02] border-b border-white/10">
+                                        <tr id="results-thead">
+                                            <!-- Headers injected here -->
+                                        </tr>
+                                    </thead>
+                                    <tbody id="results-tbody" class="font-mono text-xs">
+                                        <!-- Rows injected here -->
+                                    </tbody>
+                                </table>
+                            </div>
+                            
+                            <div class="p-6 border-t border-white/5 flex items-center justify-between bg-white/[0.01]">
+                                <span id="results-showing" class="text-[10px] text-outline uppercase tracking-widest font-bold">Showing 0 Leads</span>
+                                <div id="results-pagination" class="flex gap-2">
+                                    <!-- Pagination injected here -->
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- AI Engine Insights Card -->
+                        <div class="bg-surface-container-low p-8 rounded-[2.5rem] border border-white/5 relative overflow-hidden group">
+                           <div class="relative z-10 flex flex-col md:flex-row items-center justify-between gap-6">
+                                <div class="flex items-center gap-6">
+                                    <div class="w-16 h-16 bg-primary/10 rounded-[2.5rem] flex items-center justify-center border border-primary/20 shrink-0">
+                                        <span class="material-symbols-outlined text-primary text-4xl animate-pulse">auto_awesome</span>
+                                    </div>
+                                    <div>
+                                        <h3 class="font-headline font-bold text-2xl text-white uppercase tracking-tighter mb-1">AI Engine Insights</h3>
+                                        <p id="insight-text" class="text-on-surface-variant font-body text-sm leading-relaxed max-w-2xl">Analyzing patterns... Engaging neural layers for result optimization.</p>
+                                    </div>
+                                </div>
+                                <button class="bg-white text-black px-8 py-3 rounded-3xl font-headline font-bold uppercase text-xs tracking-widest shadow-xl transition-all hover:scale-105 active:scale-95 shrink-0">Optimize Memory</button>
+                           </div>
+                           <!-- Decorative Background Elements -->
+                           <div class="absolute top-0 right-0 w-64 h-64 bg-primary/5 rounded-full -translate-y-1/2 translate-x-1/4 blur-3xl"></div>
+                        </div>
+                    </div>
+
+
+                </div>
+            </section>
+
+            <!-- ============================================== -->
+            <!-- BRAIN & MEMORY TAB -->
+            <!-- ============================================== -->
+            <section id="tab-brain" class="max-w-6xl mx-auto hidden delay-100 ease-in fade-in">
+                <div class="mb-12">
+                    <h2 class="text-4xl lg:text-5xl font-black font-headline text-white tracking-tight leading-none mb-4">Brain & Memory Management</h2>
+                    <p class="text-outline max-w-xl font-body leading-relaxed">Neural architecture and blacklists for persistent job intelligence.</p>
+                </div>
+
+                <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                    <!-- LEFT COLUMN: LLM & Blocklist -->
+                    <div class="lg:col-span-2 space-y-8">
+                        <!-- LLM Core Connection -->
+                        <div class="bg-surface-container-low p-8 rounded-[2.5rem] border border-white/5 relative overflow-hidden group">
+                            <div class="flex items-center justify-between mb-8">
+                                <div class="flex items-center gap-4">
+                                    <div class="w-12 h-12 bg-primary/10 rounded-3xl flex items-center justify-center border border-primary/20">
+                                        <span class="material-symbols-outlined text-primary text-3xl">hub</span>
+                                    </div>
+                                    <div>
+                                        <h3 class="font-headline font-bold text-xl text-white uppercase tracking-tighter">LLM Core Connection</h3>
+                                        <p class="text-[10px] text-outline uppercase tracking-widest font-bold">Active Neural Engine</p>
+                                    </div>
+                                </div>
+                                <div id="llm-status-badge" class="px-3 py-1 bg-secondary/10 border border-secondary/20 rounded-full flex items-center gap-2">
+                                    <div class="w-1.5 h-1.5 rounded-full bg-secondary animate-pulse"></div>
+                                    <span class="text-[9px] font-mono text-secondary uppercase font-bold tracking-widest">Connected</span>
+                                </div>
+                            </div>
+
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                                <div class="space-y-3">
+                                    <label class="text-[10px] font-headline font-bold text-outline uppercase tracking-[0.2em]">Select Intelligence Model</label>
+                                    <div class="relative">
+                                        <select id="select-model" onchange="updateLLMConfig()" class="w-full bg-surface-container-lowest border-none focus:ring-1 focus:ring-primary rounded-3xl py-4 px-5 text-white font-mono text-sm appearance-none transition-all cursor-pointer">
+                                            <option value="">Loading models...</option>
+                                        </select>
+                                        <span class="material-symbols-outlined absolute right-4 top-1/2 -translate-y-1/2 text-outline pointer-events-none">expand_more</span>
+                                    </div>
+                                </div>
+                                <div class="space-y-3">
+                                    <label class="text-[10px] font-headline font-bold text-outline uppercase tracking-[0.2em]">System Prompting</label>
+                                    <div class="relative group">
+                                        <input id="input-prompt" onchange="updateLLMConfig()" class="w-full bg-surface-container-lowest border-none focus:ring-1 focus:ring-primary rounded-3xl py-4 px-5 pr-12 text-white font-mono text-sm transition-all" value="Architect Mode Active"/>
+                                        <span class="material-symbols-outlined absolute right-4 top-1/2 -translate-y-1/2 text-outline/50 group-hover:text-primary transition-colors cursor-pointer">edit</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Bouncer Blocklist -->
+                        <div class="bg-surface-container-low p-8 rounded-[2.5rem] border border-white/5">
+                            <div class="flex items-center justify-between mb-8">
+                                <div class="flex items-center gap-4">
+                                    <div class="w-12 h-12 bg-red-400/10 rounded-3xl flex items-center justify-center border border-red-400/20">
+                                        <span class="material-symbols-outlined text-red-400 text-3xl">block</span>
+                                    </div>
+                                    <div>
+                                        <h3 class="font-headline font-bold text-xl text-white uppercase tracking-tighter">Bouncer Blocklist</h3>
+                                        <p class="text-[10px] text-outline uppercase tracking-widest font-bold">Automated Domain Exclusion</p>
+                                    </div>
+                                </div>
+                                <button onclick="clearBlocklist()" class="text-[10px] font-headline font-bold text-outline hover:text-white uppercase tracking-widest transition-colors">Clear All</button>
+                            </div>
+
+                            <div id="blocklist-tags" class="flex flex-wrap gap-3 mb-8">
+                                <!-- Tags will be injected here -->
+                            </div>
+
+                            <div class="flex gap-3">
+                                <input id="input-block-domain" type="text" placeholder="Add domain (e.g. reddit.com)..." class="flex-1 bg-surface-container-lowest border-none focus:ring-1 focus:ring-primary rounded-3xl py-4 px-6 text-white font-mono text-sm transition-all placeholder:text-outline/30"/>
+                                <button onclick="addBlockDomain()" class="bg-[#2a2a2a] hover:bg-white hover:text-black px-6 rounded-3xl font-headline font-bold uppercase text-xs tracking-widest shadow-xl transition-all border border-white/5 flex items-center gap-2">
+                                    <span class="material-symbols-outlined text-lg">add</span>
+                                    Add Domain
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- RIGHT COLUMN: Bouncer Log -->
+                    <div class="lg:col-span-1">
+                        <div class="bg-surface-container-low rounded-[2.5rem] border border-white/5 flex flex-col h-full overflow-hidden">
+                            <div class="p-8 border-b border-white/5 bg-white/[0.02]">
+                                <div class="flex items-center gap-3 mb-1">
+                                    <span class="material-symbols-outlined text-primary text-xl">security</span>
+                                    <h3 class="font-headline font-bold text-lg text-white uppercase tracking-tighter">Pre-Scrape Bouncer Log</h3>
+                                </div>
+                                <p class="text-[10px] text-outline uppercase tracking-widest font-bold">Real-time Lead Validation</p>
+                            </div>
+                            
+                            <div class="flex-1 overflow-y-auto max-h-[600px] font-mono text-[11px]">
+                                <table class="w-full text-left border-collapse">
+                                    <thead class="sticky top-0 bg-surface-container-low border-b border-white/10 z-10">
+                                        <tr>
+                                            <th class="px-6 py-3 text-outline font-normal uppercase tracking-widest opacity-50">Timestamp</th>
+                                            <th class="px-6 py-3 text-outline font-normal uppercase tracking-widest opacity-50">Status</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="bouncer-log-body">
+                                        <!-- Rows injected here -->
+                                        <tr>
+                                            <td colspan="2" class="px-6 py-12 text-center text-outline opacity-30 italic">No activity recorded...</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                            
+                            <div class="p-6 border-t border-white/5 bg-white/[0.01] text-center">
+                                <button class="text-[10px] font-headline font-bold text-outline hover:text-white uppercase tracking-widest transition-colors">View Full History</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- ============================================== -->
+            <!-- CONFIGURATION TAB -->
+            <!-- ============================================== -->
+            <section id="tab-config" class="max-w-4xl mx-auto hidden delay-100 ease-in fade-in">
+                <div class="mb-12">
+                    <h2 class="text-4xl lg:text-5xl font-black font-headline text-white tracking-tight leading-none mb-4">Interactive Startup</h2>
+                    <p class="text-outline max-w-xl font-body leading-relaxed">Adjust the operational parameters for the lead scraping engine. Hit Launch to engage the autonomous loops.</p>
+                </div>
+                
+                <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                    <!-- LEFT: Existing settings -->
+                    <div class="lg:col-span-2 space-y-6">
+                        <div class="bg-surface-container-low p-8 rounded-3xl border border-white/5">
+                            <h3 class="font-headline font-bold text-lg text-white uppercase tracking-tighter mb-6">Operational Limits</h3>
+                            <div class="grid grid-cols-1 sm:grid-cols-3 gap-6">
+                                <div class="space-y-2">
+                                    <label class="text-xs font-headline font-bold text-outline uppercase tracking-widest">Target Leads</label>
+                                    <input id="input-target" class="w-full bg-surface-container-lowest border-none focus:ring-1 focus:ring-primary rounded-full py-3 px-4 text-white font-mono text-lg transition-all" value="3" type="number"/>
+                                </div>
+                                <div class="space-y-2">
+                                    <label class="text-xs font-headline font-bold text-outline uppercase tracking-widest">Search Vectors</label>
+                                    <input id="input-terms" class="w-full bg-surface-container-lowest border-none focus:ring-1 focus:ring-primary rounded-full py-3 px-4 text-white font-mono text-lg transition-all" value="3" type="number"/>
+                                </div>
+                                <div class="space-y-2">
+                                    <label class="text-xs font-headline font-bold text-outline uppercase tracking-widest">Randomize Data?</label>
+                                    <button class="w-full h-12 bg-[#2a2a2a] hover:bg-primary/20 text-primary font-headline uppercase font-bold rounded-full transition-all" onclick="document.getElementById('input-target').value = Math.floor(Math.random()*(10-2+1)+2); document.getElementById('input-terms').value = Math.floor(Math.random()*(6-2+1)+2)">
+                                        Roll Dice 🎲
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="bg-surface-container-low p-8 rounded-3xl border border-white/5">
+                            <h3 class="font-headline font-bold text-lg text-white uppercase tracking-tighter mb-4">AI Strictness Profile</h3>
+                            <div class="flex gap-4">
+                                <label class="flex-1 bg-surface-container-lowest p-4 rounded-[2rem] border border-outline-variant/30 cursor-pointer hover:border-primary/50 transition-all flex items-center gap-3">
+                                    <input type="radio" name="strictness" value="loose" class="text-primary bg-transparent border-outline">
+                                    <span class="font-headline uppercase text-[10px] sm:text-xs font-bold text-white">Loose (25%+)</span>
+                                </label>
+                                <label class="flex-1 bg-surface-container-lowest p-4 rounded-[2rem] border border-primary cursor-pointer hover:border-primary/50 transition-all flex items-center gap-3">
+                                    <input type="radio" name="strictness" value="neutral" checked class="text-primary bg-transparent border-outline">
+                                    <span class="font-headline uppercase text-[10px] sm:text-xs font-bold text-primary">Neutral (50%+)</span>
+                                </label>
+                                <label class="flex-1 bg-surface-container-lowest p-4 rounded-[2rem] border border-outline-variant/30 cursor-pointer hover:border-primary/50 transition-all flex items-center gap-3">
+                                    <input type="radio" name="strictness" value="aggressive" class="text-primary bg-transparent border-outline">
+                                    <span class="font-headline uppercase text-[10px] sm:text-xs font-bold text-white">Aggressive (75%+)</span>
+                                </label>
+                            </div>
+                        </div>
+
+                        <div class="bg-surface-container-low p-8 rounded-3xl border border-white/5">
+                            <h3 class="font-headline font-bold text-lg text-white uppercase tracking-tighter mb-4">Job Type Preference</h3>
+                            <div class="flex gap-4">
+                                <label class="flex-1 bg-surface-container-lowest p-4 rounded-[2rem] border border-outline-variant/30 cursor-pointer hover:border-primary/50 transition-all flex items-center gap-3">
+                                    <input type="radio" name="job_type" value="remote" class="text-primary bg-transparent border-outline">
+                                    <span class="font-headline uppercase text-sm font-bold text-white">Remote</span>
+                                </label>
+                                <label class="flex-1 bg-surface-container-lowest p-4 rounded-[2rem] border border-outline-variant/30 cursor-pointer hover:border-primary/50 transition-all flex items-center gap-3">
+                                    <input type="radio" name="job_type" value="on-site" class="text-primary bg-transparent border-outline">
+                                    <span class="font-headline uppercase text-sm font-bold text-white">On-Site</span>
+                                </label>
+                                <label class="flex-1 bg-surface-container-lowest p-4 rounded-[2rem] border border-primary cursor-pointer hover:border-primary/50 transition-all flex items-center gap-3">
+                                    <input type="radio" name="job_type" value="both" checked class="text-primary bg-transparent border-outline">
+                                    <span class="font-headline uppercase text-sm font-bold text-primary">Both</span>
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- RIGHT: Resume Info card -->
+                    <div class="lg:col-span-1">
+                        <div class="bg-surface-container-low p-8 rounded-3xl border border-white/5 flex flex-col h-full">
+                            <h3 class="font-headline font-bold text-lg text-white uppercase tracking-tighter mb-1">Resume Info</h3>
+                            <p class="text-xs text-outline mb-6">Upload your resume (PDF, DOCX, ODT or TXT) to train the AI on your specific professional niche.</p>
+
+                            <!-- Drop Zone -->
+                            <div id="resume-drop-zone"
+                                 class="flex-1 flex flex-col items-center justify-center border-2 border-dashed border-outline-variant/40 rounded-3xl p-6 text-center cursor-pointer hover:border-primary/60 hover:bg-primary/5 transition-all mb-6 min-h-[160px] group"
+                                 onclick="document.getElementById('resume-file-input').click()"
+                                 ondragover="event.preventDefault(); this.classList.add('border-primary','bg-primary/10')"
+                                 ondragleave="this.classList.remove('border-primary','bg-primary/10')"
+                                 ondrop="handleResumeDrop(event)">
+                                <span class="material-symbols-outlined text-5xl text-outline/50 group-hover:text-primary/70 transition-all mb-3" style="font-variation-settings:'FILL' 0,'wght' 200">description</span>
+                                <p id="resume-filename" class="font-mono text-sm text-white font-bold mb-1">resume.txt</p>
+                                <p class="text-[10px] text-outline uppercase tracking-widest">Drag &amp; Drop or Browse</p>
+                                <input type="file" id="resume-file-input" accept=".pdf,.docx,.doc,.odt,.txt" class="hidden" onchange="uploadResume(this.files[0])">
+                            </div>
+
+                            <!-- Status badge -->
+                            <div id="resume-status" class="flex items-center gap-2 mb-5 px-1">
+                                <span id="resume-status-dot" class="w-2 h-2 rounded-full bg-outline"></span>
+                                <span id="resume-status-text" class="text-[11px] font-mono text-outline uppercase tracking-widest">Not loaded</span>
+                            </div>
+
+                            <!-- Char count bar -->
+                            <div class="mb-6">
+                                <div class="flex justify-between items-end mb-1">
+                                    <span class="text-[10px] font-mono text-outline uppercase tracking-widest">Content Load</span>
+                                    <span id="resume-char-pct" class="text-[10px] font-mono text-primary">0%</span>
+                                </div>
+                                <div class="h-1 w-full bg-surface-container-highest rounded-full overflow-hidden">
+                                    <div id="resume-char-bar" class="h-full bg-gradient-to-r from-primary to-primary-container transition-all duration-700" style="width:0%"></div>
+                                </div>
+                                <p id="resume-char-count" class="text-[10px] font-mono text-outline mt-1">0 characters</p>
+                            </div>
+
+                            <!-- Preview Button -->
+                            <button onclick="previewResume()" class="w-full py-3 bg-surface-container-highest hover:bg-primary/20 border border-outline-variant/30 hover:border-primary/50 text-white font-headline font-bold uppercase tracking-widest text-sm rounded-full transition-all flex items-center justify-center gap-2">
+                                <span class="material-symbols-outlined text-primary text-lg" style="font-variation-settings:'FILL' 0">preview</span>
+                                Preview Resume
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- ============================================== -->
+            <!-- DASHBOARD TAB -->
+            <!-- ============================================== -->
+            <section id="tab-dashboard" class="max-w-7xl mx-auto block step-active pb-8">
+                <div class="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-8">
+                    <!-- Autonomous Loop-Back Engine Card -->
+                    <div class="lg:col-span-2 bg-surface-container-low p-8 rounded-3xl relative overflow-hidden group border border-white/5">
+                        <div class="absolute top-0 right-0 p-8 opacity-10 group-hover:opacity-20 transition-opacity">
+                            <span class="material-symbols-outlined text-8xl" data-icon="sync">sync</span>
+                        </div>
+                        <div class="relative z-10">
+                            <div class="flex items-center gap-3 mb-8">
+                                <span class="material-symbols-outlined text-primary" data-icon="robot_2">robot_2</span>
+                                <h2 class="font-headline text-xl font-bold uppercase tracking-tight text-white">Autonomous Loop-Back Engine</h2>
+                            </div>
+                            <div class="grid grid-cols-2 gap-12 items-end">
+                                <div>
+                                    <div class="mb-8">
+                                        <div class="flex justify-between items-end mb-2">
+                                            <span class="text-xs font-mono text-outline uppercase tracking-widest">Active Progress</span>
+                                            <span id="metric-percent" class="text-sm font-mono text-primary">0%</span>
+                                        </div>
+                                        <div class="h-1.5 w-full bg-surface-container-highest rounded-full overflow-hidden">
+                                            <div id="metric-bar" class="h-full bg-gradient-to-r from-primary to-primary-container w-[0%] transition-all duration-500"></div>
+                                        </div>
+                                    </div>
+                                    <div class="flex gap-8">
+                                        <div>
+                                            <p class="text-[10px] font-mono text-outline uppercase mb-1">Current</p>
+                                            <p class="text-3xl font-headline font-black text-white">Batch <span id="metric-batch">1</span></p>
+                                        </div>
+                                        <div>
+                                            <p class="text-[10px] font-mono text-outline uppercase mb-1">Objective</p>
+                                            <p class="text-3xl font-headline font-black text-white"><span id="metric-found">0</span> <span class="text-outline/50 text-xl font-light">/ <span id="metric-target">--</span> Leads</span></p>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="flex flex-col items-end gap-4">
+                                    <button id="btn-engage-dashboard" onclick="launchJob()" class="w-64 justify-center py-3 bg-gradient-to-r from-primary to-primary-container text-on-primary-container hover:opacity-90 transition-all flex items-center gap-3 rounded-full shadow-[0_0_20px_rgba(77,142,255,0.3)] whitespace-nowrap">
+                                        <span class="material-symbols-outlined" data-icon="rocket_launch">rocket_launch</span>
+                                        <span class="font-headline font-bold uppercase tracking-widest text-sm">Engage Engine</span>
+                                    </button>
+                                    <button id="btn-stop-dashboard" onclick="stopEngine()" class="hidden w-64 justify-center py-3 bg-surface-container-highest hover:bg-red-500/20 hover:text-red-400 text-outline transition-all flex items-center gap-3 rounded group/btn border border-white/5 whitespace-nowrap">
+                                        <span class="material-symbols-outlined group-hover/btn:scale-110 duration-200" data-icon="pause">pause</span>
+                                        <span class="font-headline font-bold uppercase tracking-widest text-sm">Stop Engine</span>
+                                    </button>
+                                    <p class="text-[10px] font-mono text-outline-variant italic w-64 text-center">Configuration params apply on launch.</p>
+                                </div>
+                            </div>
+                            <!-- Bottom Center Settings Pills -->
+                            <div id="settings-pills" class="hidden flex flex-wrap items-center justify-center gap-6 mt-8 pt-6 border-t border-white/5 relative z-20">
+                                <span class="px-5 py-2 bg-surface-container-lowest rounded-full border border-outline-variant/30 text-xs font-mono text-outline uppercase tracking-widest shadow"><span id="pill-leads" class="text-white font-bold text-sm">5</span> LEADS</span>
+                                <span class="px-5 py-2 bg-surface-container-lowest rounded-full border border-outline-variant/30 text-xs font-mono text-outline uppercase tracking-widest shadow"><span id="pill-terms" class="text-white font-bold text-sm">3</span> VECTORS</span>
+                                <span class="px-5 py-2 bg-surface-container-lowest rounded-full border border-outline-variant/30 text-xs font-mono text-outline uppercase tracking-widest shadow" id="pill-strictness">AGGRESSIVE</span>
+                                <span class="px-5 py-2 bg-surface-container-lowest rounded-full border border-outline-variant/30 text-xs font-mono text-outline uppercase tracking-widest shadow" id="pill-jobtype"><span class="text-white font-bold text-sm">BOTH</span></span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Timer/Circular Progress Ring -->
+                    <div class="bg-surface-container-low p-8 rounded-3xl flex flex-col items-center justify-center text-center border border-white/5">
+                        <div class="relative w-48 h-48 mb-6">
+                            <!-- Background Circle -->
+                            <svg class="w-full h-full transform -rotate-90">
+                                <circle class="text-surface-container-highest" cx="96" cy="96" fill="transparent" r="88" stroke="currentColor" stroke-width="6"></circle>
+                                <circle id="timer-ring" class="text-primary transition-all duration-1000" cx="96" cy="96" fill="transparent" r="88" stroke="currentColor" stroke-dasharray="552.92" stroke-dashoffset="0" stroke-width="6"></circle>
+                            </svg>
+                            <!-- Inner Content -->
+                            <div class="absolute inset-0 flex flex-col items-center justify-center">
+                                <span class="text-[10px] font-mono text-outline uppercase tracking-tighter">Elapsed</span>
+                                <span id="elapsed-time" class="text-3xl font-headline font-black text-white">00:00</span>
+                                <span id="timer-status" class="text-[10px] font-mono text-outline uppercase tracking-tighter">IDLE</span>
+                            </div>
+                        </div>
+                        <div class="space-y-1">
+                            <p class="font-headline text-sm font-bold text-white uppercase tracking-widest" id="job-id-text">Task Setup Required</p>
+                            <p class="text-xs text-outline italic" id="job-time-text">Awaiting Launch</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Stats -->
+                <div class="grid grid-cols-3 gap-4 mb-6">
+                    <div class="bg-surface-container-lowest p-6 rounded-[2rem] border border-outline-variant/20">
+                        <p class="text-[10px] font-mono text-outline uppercase mb-2">Pages Scraped</p>
+                        <p id="stat-scraped" class="text-2xl font-headline font-black text-white">0</p>
+                    </div>
+                    <div class="bg-surface-container-lowest p-6 rounded-[2rem] border border-outline-variant/20">
+                        <p class="text-[10px] font-mono text-outline uppercase mb-2">Verified</p>
+                        <p id="stat-verified" class="text-2xl font-headline font-black text-secondary">0</p>
+                    </div>
+                    <div class="bg-surface-container-lowest p-6 rounded-[2rem] border border-outline-variant/20">
+                        <p class="text-[10px] font-mono text-outline uppercase mb-2">Rejected</p>
+                        <p id="stat-rejected" class="text-2xl font-headline font-black text-[#ff5451]">0</p>
+                    </div>
+                </div>
+
+                <!-- Terminal -->
+                <div class="bg-[#0e0e0e] rounded-3xl overflow-hidden flex flex-col border border-outline-variant/30">
+                    <div class="bg-surface-container-low px-4 py-2 border-b border-outline-variant/30 flex items-center gap-2">
+                        <div class="w-2.5 h-2.5 rounded-full bg-red-500/20"></div>
+                        <div class="w-2.5 h-2.5 rounded-full bg-yellow-500/20"></div>
+                        <div class="w-2.5 h-2.5 rounded-full bg-green-500/20"></div>
+                        <span class="text-[10px] font-mono text-outline uppercase tracking-widest ml-4">Live Event Stream</span>
+                    </div>
+                    <div id="terminal" class="p-4 h-[400px] overflow-y-auto font-mono text-xs leading-relaxed space-y-2">
+                        <!-- Entries inserted by JS -->
+                    </div>
+                </div>
+            </section>
+        </div>
+    </main>
+</div>
+
+<script>
+    // --- BRANDING MIGRATION ---
+    if (localStorage.getItem('leadArchSetupCompleted')) {
+        localStorage.setItem('jobManSetupCompleted', 'true');
+        localStorage.removeItem('leadArchSetupCompleted');
+    }
+
+    function switchTab(tab) {
+        document.getElementById('tab-config').classList.add('hidden');
+        document.getElementById('tab-dashboard').classList.add('hidden');
+        document.getElementById('tab-brain').classList.add('hidden');
+        document.getElementById('tab-results').classList.add('hidden');
+        
+        document.getElementById('tab-' + tab).classList.remove('hidden');
+        document.getElementById('tab-' + tab).classList.add('step-active');
+        
+        // Update sidebar buttons
+        ['dashboard', 'config', 'brain', 'results'].forEach(t => {
+            const btn = document.getElementById('btn-' + t);
+            if(t === tab) {
+                btn.className = "w-full flex items-center gap-3 px-4 py-3 font-headline tracking-tight text-sm uppercase font-bold transition-all bg-[#2a2a2a] text-[#adc6ff] border-l-4 border-[#3B82F6] rounded-r";
+            } else {
+                btn.className = "w-full flex items-center gap-3 px-4 py-3 font-headline tracking-tight text-sm uppercase font-bold transition-all text-[#a0a0a0] hover:bg-[#201f1f] hover:text-white rounded";
+            }
+        });
+
+        if(tab === 'brain') {
+            loadBrainData();
+        }
+        if(tab === 'results') {
+            loadResultsData();
+        }
+        if(tab === 'dashboard') {
+            loadMetrics();
+        }
+    }
+
+    let searchParams = null;
+    let eventSource = null;
+    let timerInterval = null;
+    let bouncerLogInterval = null;
+    let startTime = null;
+    
+    // ── Results & Metrics State ──
+    let _resultsData = [];
+    let _currentResultsType = 'verified';
+    let _metricsData = null;
+    let _metricsResultsVerified = [];
+    let _metricsResultsRejected = [];
+
+    async function loadResultsData() {
+        await loadMetrics();
+        await switchResultsType('verified');
+    }
+
+    async function loadMetrics() {
+        try {
+            const r = await fetch('/api/metrics');
+            _metricsData = await r.json();
+            
+            // Update Counts
+            document.getElementById('badge-v-count').innerText = _metricsData.verified;
+            document.getElementById('badge-r-count').innerText = _metricsData.rejected;
+            
+            // Update Dashboard Counters
+            document.getElementById('stat-verified').innerText = _metricsData.verified;
+            document.getElementById('stat-rejected').innerText = _metricsData.rejected;
+            
+            // Update AI Insight
+            const insightText = document.getElementById('insight-text');
+            if(_metricsData.insights && _metricsData.insights.length > 0) {
+                insightText.innerText = _metricsData.insights[Math.floor(Math.random() * _metricsData.insights.length)];
+            }
+            
+        } catch(e) { console.error("Error loading metrics:", e); }
+    }
+
+    async function switchResultsType(type) {
+        _currentResultsType = type;
+        
+        // UI Toggles
+        const btnV = document.getElementById('btn-results-v');
+        const btnR = document.getElementById('btn-results-r');
+        const title = document.getElementById('results-title');
+        const subtitle = document.getElementById('results-subtitle');
+        const icon = document.getElementById('results-icon');
+        
+        if(type === 'verified') {
+            btnV.className = "flex items-center gap-3 px-6 py-3 bg-surface-container-low border border-primary rounded-3xl text-primary font-headline font-bold uppercase text-xs tracking-widest transition-all";
+            btnR.className = "flex items-center gap-3 px-6 py-3 bg-surface-container-low border border-white/5 rounded-3xl text-outline font-headline font-bold uppercase text-xs tracking-widest transition-all hover:bg-white/5";
+            title.innerText = "Verified Lead Candidates";
+            subtitle.innerText = "Confidence Interval > 85%";
+            icon.innerText = "fact_check";
+            icon.className = "material-symbols-outlined text-secondary text-2xl";
+        } else {
+            btnR.className = "flex items-center gap-3 px-6 py-3 bg-surface-container-low border border-red-400 rounded-3xl text-red-400 font-headline font-bold uppercase text-xs tracking-widest transition-all";
+            btnV.className = "flex items-center gap-3 px-6 py-3 bg-surface-container-low border border-white/5 rounded-3xl text-outline font-headline font-bold uppercase text-xs tracking-widest transition-all hover:bg-white/5";
+            title.innerText = "Automated Rejection Log";
+            subtitle.innerText = "Filtered by AI matching engine";
+            icon.innerText = "cancel";
+            icon.className = "material-symbols-outlined text-red-400 text-2xl";
+        }
+        
+        try {
+            const r = await fetch(`/api/results?type=${type}`);
+            const data = await r.json();
+            if (type === 'verified') _metricsResultsVerified = data;
+            else _metricsResultsRejected = data;
+            renderResultsTable(data, type);
+        } catch(e) { console.error("Error fetching results:", e); }
+    }
+
+    function renderResultsTable(data, type) {
+        const thead = document.getElementById('results-thead');
+        const tbody = document.getElementById('results-tbody');
+        const showing = document.getElementById('results-showing');
+        
+        tbody.innerHTML = '';
+        showing.innerText = `Showing ${data.length} Leads`;
+        
+        if (data.length === 0) {
+            tbody.innerHTML = '<tr><td colspan="5" class="py-12 text-center text-outline opacity-30 italic">No data found in this channel...</td></tr>';
+            return;
+        }
+
+        if(type === 'verified') {
+            thead.innerHTML = `
+                <th class="px-8 py-4 text-[10px] text-outline uppercase tracking-widest opacity-60">Job Title</th>
+                <th class="px-8 py-4 text-[10px] text-outline uppercase tracking-widest opacity-60">Source</th>
+                <th class="px-8 py-4 text-[10px] text-outline uppercase tracking-widest opacity-60 text-center">Match Score</th>
+                <th class="px-8 py-4 text-[10px] text-outline uppercase tracking-widest opacity-60">Posted</th>
+                <th class="px-8 py-4 text-[10px] text-outline uppercase tracking-widest opacity-60 text-right">Action</th>
+            `;
+            
+            data.forEach(item => {
+                let score = parseInt(item.match_score) || 0;
+                // AI returns "High", "Medium", "Low" - map these to percentages if not numeric
+                if (isNaN(parseInt(item.match_score))) {
+                    const s = (item.match_score || "").toLowerCase();
+                    if (s.includes("high")) score = 95;
+                    else if (s.includes("medium")) score = 75;
+                    else if (s.includes("low")) score = 45;
+                }
+
+                let scoreClass = "text-red-400";
+                let barClass = "bg-red-400";
+                
+                if(score > 60) { scoreClass = "text-secondary"; barClass = "bg-secondary"; }
+                if(score > 85) { scoreClass = "text-primary"; barClass = "bg-primary"; }
+                
+                const row = `
+                    <tr class="border-b border-white/[0.03] hover:bg-white/[0.02] transition-all group">
+                        <td class="px-8 py-5">
+                            <div class="text-white font-bold group-hover:text-primary transition-colors">${item.title}</div>
+                            <div class="text-[10px] text-outline/50 truncate max-w-[200px]">${item.url}</div>
+                        </td>
+                        <td class="px-8 py-5 text-outline">${item.website}</td>
+                        <td class="px-8 py-5">
+                            <div class="flex items-center gap-3 justify-center">
+                                <div class="w-24 h-1.5 bg-white/5 rounded-full overflow-hidden">
+                                    <div class="h-full ${barClass}" style="width: ${score}%"></div>
+                                </div>
+                                <span class="font-bold ${scoreClass}">${score}%</span>
+                            </div>
+                        </td>
+                        <td class="px-8 py-5 text-outline/70">${item.posted || 'N/A'}</td>
+                        <td class="px-8 py-5 text-right">
+                            <button onclick="viewLeadDetails(${_metricsResultsVerified.indexOf(item)}, 'verified')" class="px-4 py-2 bg-primary/10 text-primary rounded-full font-headline font-black uppercase text-[10px] tracking-widest hover:bg-primary text-on-primary-container transition-all active:scale-95 shadow-lg border border-primary/20">
+                                View Details
+                            </button>
+                        </td>
+                    </tr>
+                `;
+                tbody.insertAdjacentHTML('beforeend', row);
+            });
+        } else {
+            thead.innerHTML = `
+                <th class="px-8 py-4 text-[10px] text-outline uppercase tracking-widest opacity-60">Entity / Candidate</th>
+                <th class="px-8 py-4 text-[10px] text-outline uppercase tracking-widest opacity-60">Rejection Reason</th>
+                <th class="px-8 py-4 text-[10px] text-outline uppercase tracking-widest opacity-60 text-right">System Output</th>
+            `;
+            
+            data.forEach(item => {
+                const row = `
+                    <tr class="border-b border-white/[0.03] hover:bg-white/[0.02] transition-all group">
+                        <td class="px-8 py-5">
+                            <div class="text-white group-hover:text-red-400 transition-colors uppercase text-[10px] font-bold">${item.title || 'Unknown Role'}</div>
+                            <div class="text-[10px] text-outline/50">${item.website}</div>
+                        </td>
+                        <td class="px-8 py-5">
+                            <div class="flex items-center gap-3 text-red-300">
+                                <span class="material-symbols-outlined text-sm">info</span>
+                                <span class="font-body italic text-xs capitalize">${item.match_reason}</span>
+                            </div>
+                        </td>
+                        <td class="px-8 py-5 text-right flex items-center justify-end gap-4">
+                             <button onclick="viewLeadDetails(${_metricsResultsRejected.indexOf(item)}, 'rejected')" class="px-4 py-2 bg-white/5 text-outline rounded-full font-headline font-black uppercase text-[10px] tracking-widest hover:bg-white/10 hover:text-white transition-all active:scale-95 border border-white/10">
+                                View Analysis
+                            </button>
+                            <span class="text-outline/[0.1] font-mono uppercase text-[9px] tracking-tighter">
+                                AI FILTERED
+                            </span>
+                        </td>
+                    </tr>
+                `;
+                tbody.insertAdjacentHTML('beforeend', row);
+            });
+        }
+    }
+
+    function filterResultsTable() {
+        const query = document.getElementById('input-results-search').value.toLowerCase();
+        if(!query) {
+            renderResultsTable(_resultsData, _currentResultsType);
+            return;
+        }
+        const filtered = _resultsData.filter(item => 
+            (item.title && item.title.toLowerCase().includes(query)) || 
+            (item.website && item.website.toLowerCase().includes(query)) ||
+            (item.url && item.url.toLowerCase().includes(query)) ||
+            (item.match_reason && item.match_reason.toLowerCase().includes(query))
+        );
+        renderResultsTable(filtered, _currentResultsType);
+    }
+
+    async function copyResultsPath() {
+        try {
+            const r = await fetch('/api/export/path');
+            const data = await r.json();
+            
+            if (window.isSecureContext && navigator.clipboard) {
+                await navigator.clipboard.writeText(data.path);
+                alert("Results Path Copied to Clipboard!\n\n" + data.path);
+            } else {
+                // Fallback
+                const el = document.createElement('textarea');
+                el.value = data.path;
+                document.body.appendChild(el);
+                el.select();
+                document.execCommand('copy');
+                document.body.removeChild(el);
+                alert("Results Path Copied to Clipboard!\n\n" + data.path);
+            }
+        } catch(e) { alert("Error retrieving path: " + e); }
+    }
+    
+    // ── Brain & Memory State ──
+    let _brainConfig = { blocked_domains: [], llm_model: '', system_prompt: '' };
+
+    async function loadBrainData() {
+        try {
+            // Load list of models
+            const modRes = await fetch('/api/models');
+            const modData = await modRes.json();
+            const sel = document.getElementById('select-model');
+            sel.innerHTML = '';
+            (modData.models || []).forEach(m => {
+                const opt = document.createElement('option');
+                opt.value = m.name;
+                opt.innerText = m.name;
+                sel.appendChild(opt);
+            });
+
+            // Load current config
+            const cfgRes = await fetch('/api/config');
+            _brainConfig = await cfgRes.json();
+            
+            document.getElementById('select-model').value = _brainConfig.llm_model;
+            document.getElementById('input-prompt').value = _brainConfig.system_prompt;
+            renderBlocklist();
+            refreshBouncerLog();
+        } catch(e) { console.error("Error loading brain data:", e); }
+    }
+
+    function renderBlocklist() {
+        const container = document.getElementById('blocklist-tags');
+        container.innerHTML = '';
+        _brainConfig.blocked_domains.forEach(d => {
+            const tag = document.createElement('div');
+            tag.className = "flex items-center gap-2 bg-white/5 border border-white/10 px-3 py-1.5 rounded-2xl text-[11px] font-mono text-white group-hover:border-primary/30 transition-all";
+            tag.innerHTML = `
+                <span>${d}</span>
+                <button onclick="removeBlockDomain('${d}')" class="text-outline hover:text-red-400 transition-colors">
+                    <span class="material-symbols-outlined text-sm">close</span>
+                </button>
+            `;
+            container.appendChild(tag);
+        });
+    }
+
+    async function updateLLMConfig() {
+        const model = document.getElementById('select-model').value;
+        const prompt = document.getElementById('input-prompt').value;
+        _brainConfig.llm_model = model;
+        _brainConfig.system_prompt = prompt;
+        await fetch('/api/config', {
+            method: 'POST',
+            body: JSON.stringify({ llm_model: model, system_prompt: prompt })
+        });
+    }
+
+    async function addBlockDomain() {
+        const input = document.getElementById('input-block-domain');
+        const domain = input.value.trim().toLowerCase();
+        if (!domain || _brainConfig.blocked_domains.includes(domain)) return;
+        
+        _brainConfig.blocked_domains.push(domain);
+        input.value = '';
+        renderBlocklist();
+        await fetch('/api/config', {
+            method: 'POST',
+            body: JSON.stringify({ blocked_domains: _brainConfig.blocked_domains })
+        });
+    }
+
+    async function removeBlockDomain(domain) {
+        _brainConfig.blocked_domains = _brainConfig.blocked_domains.filter(d => d !== domain);
+        renderBlocklist();
+        await fetch('/api/config', {
+            method: 'POST',
+            body: JSON.stringify({ blocked_domains: _brainConfig.blocked_domains })
+        });
+    }
+
+    async function clearBlocklist() {
+        _brainConfig.blocked_domains = [];
+        renderBlocklist();
+        await fetch('/api/config', {
+            method: 'POST',
+            body: JSON.stringify({ blocked_domains: [] })
+        });
+    }
+
+    async function refreshBouncerLog() {
+        try {
+            const r = await fetch('/api/bouncer/logs');
+            const logs = await r.json();
+            const body = document.getElementById('bouncer-log-body');
+            if (logs.length === 0) {
+                body.innerHTML = '<tr><td colspan="2" class="px-6 py-12 text-center text-outline opacity-30 italic">No activity recorded...</td></tr>';
+                return;
+            }
+            body.innerHTML = '';
+            logs.forEach(l => {
+                let statusClass = "text-secondary";
+                if (l.status === 'BLOCKED') statusClass = "text-red-400";
+                if (l.status === 'DUPLICATE') statusClass = "text-primary";
+                
+                const row = `
+                    <tr class="border-b border-white/[0.03] hover:bg-white/[0.01] transition-colors group">
+                        <td class="px-6 py-4">
+                            <div class="text-outline/70 mb-0.5">${l.timestamp}</div>
+                            <div class="text-white/40 truncate max-w-[200px]" title="${l.url}">${l.url}</div>
+                        </td>
+                        <td class="px-6 py-4">
+                            <div class="flex items-center gap-2 ${statusClass} font-bold">
+                                <div class="w-1 h-1 rounded-full bg-current"></div>
+                                ${l.status}
+                            </div>
+                            <div class="text-[10px] text-outline/50 mt-0.5 capitalize">${l.reason}</div>
+                        </td>
+                    </tr>
+                `;
+                body.insertAdjacentHTML('beforeend', row);
+            });
+        } catch(e) {}
+    }
+    
+    // UI MODAL: FIRST RUN WIZARD
+    window.onload = () => {
+        checkSmartSetup();
+    };
+
+    let setupPoller = null;
+    let currentRecModel = "";
+
+    async function checkSmartSetup() {
+        try {
+            const r = await fetch('/api/setup/status');
+            const data = await r.json();
+            
+            const overlay = document.getElementById('setup-overlay');
+            const indicator = document.getElementById('setup-indicator');
+            const mainBtn = document.getElementById('setup-main-btn');
+
+            // Update Hardware Metrics
+            document.getElementById('setup-ram').innerText = data.specs.ram_gb + " GB";
+            document.getElementById('setup-gpu').innerText = data.specs.gpu || "None Detected";
+            document.getElementById('setup-model-name').innerText = data.recommended_model.toUpperCase();
+            currentRecModel = data.recommended_model;
+
+            const isReady = data.ollama_ready && data.model_ready;
+
+            if (!isReady) {
+                overlay.classList.remove('hidden');
+                indicator.classList.remove('hidden');
+                
+                // Update Ollama UI
+                const olIcon = document.getElementById('ollama-status-icon');
+                const olText = document.getElementById('ollama-status-text');
+                
+                if (data.ollama_ready) {
+                    olIcon.className = "w-2 h-2 rounded-full bg-secondary shadow-[0_0_10px_rgba(78,222,163,0.5)]";
+                    olText.innerText = "ONLINE & READY";
+                    olText.className = "text-[10px] font-mono text-secondary uppercase tracking-widest font-bold";
+                } else {
+                    olIcon.className = "w-2 h-2 rounded-full bg-[#ff5451] animate-pulse";
+                    olText.innerText = "NOT DETECTED";
+                    olText.className = "text-[10px] font-mono text-[#ff5451] uppercase tracking-widest font-bold";
+                    
+                    mainBtn.disabled = false;
+                    mainBtn.className = "w-full py-4 bg-primary text-on-primary-container font-headline font-black uppercase tracking-widest rounded-full hover:scale-[1.02] active:scale-95 transition-all flex items-center justify-center gap-3 shadow-xl";
+                    mainBtn.innerHTML = '<span class="material-symbols-outlined text-xl">terminal</span> Install Ollama Engine';
+                    mainBtn.onclick = installOllama;
+                }
+
+                // Update Model UI
+                if (data.ollama_ready) {
+                    const modIcon = document.getElementById('model-status-icon');
+                    const modText = document.getElementById('model-status-text');
+                    
+                    if (data.model_ready) {
+                        modIcon.className = "w-2 h-2 rounded-full bg-secondary shadow-[0_0_10px_rgba(78,222,163,0.5)]";
+                        modText.innerText = "DEPLOYED";
+                        modText.className = "text-[10px] font-mono text-secondary uppercase tracking-widest font-bold";
+                    } else {
+                        modIcon.className = "w-2 h-2 rounded-full bg-yellow-400 animate-pulse";
+                        modText.innerText = "PENDING DOWNLOAD";
+                        modText.className = "text-[10px] font-mono text-yellow-400 uppercase tracking-widest font-bold";
+                        
+                        mainBtn.disabled = false;
+                        mainBtn.className = "w-full py-4 bg-primary text-on-primary-container font-headline font-black uppercase tracking-widest rounded-full hover:scale-[1.02] active:scale-95 transition-all flex items-center justify-center gap-3 shadow-xl";
+                        mainBtn.innerHTML = '<span class="material-symbols-outlined text-xl">download_for_offline</span> Download AI Brain File';
+                        mainBtn.onclick = startModelPull;
+                    }
+                }
+
+                if (!setupPoller) setupPoller = setInterval(checkSmartSetup, 3000);
+            } else {
+                overlay.classList.add('hidden');
+                indicator.classList.add('hidden');
+                if (setupPoller) {
+                    clearInterval(setupPoller);
+                    setupPoller = null;
+                }
+                
+                // Final handoff to main onboarding or dashboard
+                if (!localStorage.getItem('jobManSetupCompleted')) {
+                    showOnboardingModal();
+                } else {
+                    loadMetrics();
+                }
+            }
+
+        } catch(e) { console.error("Setup Check Failed:", e); }
+    }
+
+    async function installOllama() {
+        const btn = document.getElementById('setup-main-btn');
+        btn.disabled = true;
+        btn.innerHTML = '<span class="material-symbols-outlined text-xl animate-spin">sync</span> Launching Installer...';
+        await fetch('/api/setup/install-ollama', { method: 'POST' });
+        setTimeout(() => {
+            btn.innerHTML = '<span class="material-symbols-outlined text-xl">check_circle</span> Installer Spawning';
+        }, 1000);
+    }
+
+    async function startModelPull() {
+        const btn = document.getElementById('setup-main-btn');
+        btn.disabled = true;
+        btn.innerHTML = '<span class="material-symbols-outlined text-xl animate-spin">downloading</span> Starting Download...';
+        await fetch('/api/setup/pull-model', { 
+            method: 'POST', 
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({ model: currentRecModel })
+        });
+    }
+    
+    let modalStep = 1;
+    function handleModalKeydown(e) {
+        if(e.key.toLowerCase() === 'n') {
+            e.preventDefault();
+            if(modalStep === 1) document.getElementById('modal-target').value = Math.floor(Math.random()*8+2);
+            if(modalStep === 2) document.getElementById('modal-terms').value = Math.floor(Math.random()*4+2);
+        }
+        if(e.key === 'Enter') {
+            e.preventDefault();
+            nextModalStep();
+        }
+    }
+
+    function showOnboardingModal() {
+        const modalHtml = `
+            <div id="setup-modal" class="fixed inset-0 z-[100] flex items-center justify-center bg-black/80 backdrop-blur-md fade-in">
+                <div class="bg-surface-container-highest p-8 rounded-[2.5rem] border border-white/10 w-full max-w-lg shadow-2xl relative text-center">
+                    <div class="inline-flex items-center gap-2 px-3 py-1 bg-primary/10 rounded-full mb-6 border border-primary/20 mx-auto">
+                        <span class="text-[10px] font-headline font-bold text-primary uppercase tracking-widest">System Boot Sequence</span>
+                    </div>
+                    
+                    <div id="step-1" class="space-y-4 step-active">
+                        <h2 class="text-2xl font-black font-headline text-white tracking-tight">How many verified leads do you want?</h2>
+                        <p class="text-outline text-sm font-body mb-4">Enter a target number or roll the dice.</p>
+                        <input id="modal-target" type="number" min="1" value="5" class="w-full bg-surface-container-lowest border border-white/5 focus:ring-2 focus:ring-primary rounded-full py-3 px-4 text-white font-mono text-xl text-center" />
+                        <button onclick="document.getElementById('modal-target').value = Math.floor(Math.random()*8+2)" class="text-xs text-primary font-bold uppercase underline">Press 'n' to Randomize</button>
+                    </div>
+                    
+                    <div id="step-2" class="space-y-4 hidden">
+                        <h2 class="text-2xl font-black font-headline text-white tracking-tight">How many search terms should AI generate?</h2>
+                        <p class="text-outline text-sm font-body mb-4">Vectors guide the Google Scraping bot.</p>
+                        <input id="modal-terms" type="number" min="1" value="3" class="w-full bg-surface-container-lowest border border-white/5 focus:ring-2 focus:ring-primary rounded-full py-3 px-4 text-white font-mono text-xl text-center" />
+                        <button onclick="document.getElementById('modal-terms').value = Math.floor(Math.random()*4+2)" class="text-xs text-primary font-bold uppercase underline">Press 'n' to Randomize</button>
+                    </div>
+                    
+                    <div id="step-3" class="space-y-4 hidden">
+                        <h2 class="text-2xl font-black font-headline text-white tracking-tight">Select AI Sorting Strictness</h2>
+                        <p class="text-outline text-sm font-body mb-4">How aggressive should the resume filter be?</p>
+                        <div class="flex gap-2">
+                            <label class="flex-1 bg-surface-container-lowest p-3 rounded-[2rem] border border-outline-variant/30 cursor-pointer hover:border-primary/50 transition-all text-center">
+                                <input type="radio" name="modal-strictness" value="loose" class="hidden">
+                                <span class="font-headline uppercase text-[10px] font-bold text-white leading-none">Loose (25%)</span>
+                            </label>
+                            <label class="flex-1 bg-surface-container-lowest p-3 rounded-[2rem] border border-primary cursor-pointer transition-all text-center">
+                                <input type="radio" name="modal-strictness" value="neutral" checked class="hidden">
+                                <span class="font-headline uppercase text-[10px] font-bold text-primary leading-none">Neutral (50%)</span>
+                            </label>
+                            <label class="flex-1 bg-surface-container-lowest p-3 rounded-[2rem] border border-outline-variant/30 cursor-pointer hover:border-primary/50 transition-all text-center">
+                                <input type="radio" name="modal-strictness" value="aggressive" class="hidden">
+                                <span class="font-headline uppercase text-[10px] font-bold text-white leading-none">Aggressive (75%)</span>
+                            </label>
+                        </div>
+                    </div>
+
+                    <div class="mt-8 flex flex-col items-center justify-center space-y-4">
+                        <div class="flex w-3/4 gap-3">
+                            <button id="btn-modal-prev" onclick="prevModalStep()" class="w-1/3 py-3 bg-surface-container-highest border border-white/5 text-outline font-headline font-bold uppercase tracking-widest text-sm rounded-full hover:bg-white/5 transition-all opacity-50 cursor-not-allowed text-center" disabled>← Back</button>
+                            <button id="btn-modal-next" onclick="nextModalStep()" class="flex-1 py-3 bg-primary text-on-primary-container font-headline font-bold uppercase tracking-widest text-sm rounded-full shadow-lg hover:opacity-90 transition-all active:scale-95 text-center">Next →</button>
+                        </div>
+                        <p class="text-[10px] font-mono text-outline-variant italic">Note: You can change these in the Configuration tab anytime.</p>
+                    </div>
+                </div>
+            </div>
+        `;
+        document.body.insertAdjacentHTML('beforeend', modalHtml);
+        document.addEventListener('keydown', handleModalKeydown);
+        
+        // Add listeners for radio buttons to highlight them
+        document.querySelectorAll('input[name="modal-strictness"]').forEach(r => {
+            r.addEventListener('change', (e) => {
+                document.querySelectorAll('input[name="modal-strictness"]').forEach(radio => {
+                     radio.parentElement.className = "flex-1 bg-surface-container-lowest p-4 rounded-[2rem] border border-outline-variant/30 cursor-pointer hover:border-primary/50 transition-all text-center";
+                     radio.nextElementSibling.className = "font-headline uppercase text-sm font-bold text-white";
+                });
+                e.target.parentElement.className = "flex-1 bg-surface-container-lowest p-4 rounded-[2rem] border border-primary cursor-pointer transition-all text-center";
+                e.target.nextElementSibling.className = "font-headline uppercase text-sm font-bold text-primary";
+            });
+        });
+    }
+
+    function updateModalState() {
+        document.getElementById('step-1').classList.remove('step-active');
+        document.getElementById('step-1').classList.add('hidden');
+        document.getElementById('step-2').classList.remove('step-active');
+        document.getElementById('step-2').classList.add('hidden');
+        document.getElementById('step-3').classList.remove('step-active');
+        document.getElementById('step-3').classList.add('hidden');
+
+        const activeStep = document.getElementById(`step-${modalStep}`);
+        activeStep.classList.remove('hidden');
+        // Force reflow for animation
+        void activeStep.offsetWidth;
+        activeStep.classList.add('step-active');
+
+        const btnPrev = document.getElementById('btn-modal-prev');
+        const btnNext = document.getElementById('btn-modal-next');
+
+        if (modalStep === 1) {
+            btnPrev.disabled = true;
+            btnPrev.classList.add('opacity-50', 'cursor-not-allowed');
+            btnPrev.classList.remove('hover:bg-white/5');
+            btnNext.innerText = "Next →";
+        } else {
+            btnPrev.disabled = false;
+            btnPrev.classList.remove('opacity-50', 'cursor-not-allowed');
+            btnPrev.classList.add('hover:bg-white/5');
+            btnNext.innerText = modalStep === 3 ? "Finish" : "Next →";
+        }
+    }
+
+    function prevModalStep() {
+        if(modalStep > 1) {
+            modalStep--;
+            updateModalState();
+        }
+    }
+
+    function nextModalStep() {
+        if(modalStep < 3) {
+            modalStep++;
+            updateModalState();
+        } else {
+            // Apply to internal logic
+            const mTarget = Math.max(1, parseInt(document.getElementById('modal-target').value) || 1);
+            const mTerms = Math.max(1, parseInt(document.getElementById('modal-terms').value) || 1);
+            const mStrict = document.querySelector('input[name="modal-strictness"]:checked').value;
+            
+            document.getElementById('input-target').value = mTarget;
+            document.getElementById('input-terms').value = mTerms;
+            document.querySelector(`input[name="strictness"][value="${mStrict}"]`).checked = true;
+            
+            localStorage.setItem('jobManSetupCompleted', 'true');
+            document.removeEventListener('keydown', handleModalKeydown);
+            document.getElementById('setup-modal').remove();
+            
+            // Switch to config immediately so they see it worked
+            switchTab('config');
+        }
+    }
+
+    async function launchJob() {
+        const strictness = document.querySelector('input[name="strictness"]:checked').value;
+        const target = parseInt(document.getElementById('input-target').value);
+        const terms = parseInt(document.getElementById('input-terms').value);
+        const jobType = document.querySelector('input[name="job_type"]:checked').value;
+        
+        // UI Toggles
+        document.getElementById('btn-engage-dashboard').classList.add('hidden');
+        document.getElementById('btn-stop-dashboard').classList.remove('hidden');
+        document.getElementById('settings-pills').classList.remove('hidden');
+        
+        document.getElementById('pill-leads').innerText = target;
+        document.getElementById('pill-terms').innerText = terms;
+        if(strictness === 'loose') {
+             document.getElementById('pill-strictness').className = "px-5 py-2 bg-surface-container-lowest rounded-full border border-outline-variant/30 text-xs font-mono text-outline uppercase tracking-widest shadow";
+             document.getElementById('pill-strictness').innerHTML = `<span class="text-white font-bold text-sm">LOOSE (25%+)</span>`;
+        } else if(strictness === 'neutral') {
+             document.getElementById('pill-strictness').className = "px-5 py-2 bg-primary/10 rounded-full border border-primary/30 text-xs font-mono text-primary uppercase tracking-widest shadow";
+             document.getElementById('pill-strictness').innerHTML = `<span class="text-primary font-bold text-sm">NEUTRAL (50%+)</span>`;
+        } else {
+             document.getElementById('pill-strictness').className = "px-5 py-2 bg-secondary/10 rounded-full border border-secondary/30 text-xs font-mono text-secondary uppercase tracking-widest shadow";
+             document.getElementById('pill-strictness').innerHTML = `<span class="text-secondary font-bold text-sm">AGGRESSIVE (75%+)</span>`;
+        }
+        // Job type pill
+        const jtLabel = jobType === 'remote' ? 'REMOTE' : jobType === 'on-site' ? 'ON-SITE' : 'BOTH';
+        document.getElementById('pill-jobtype').innerHTML = `<span class="text-white font-bold text-sm">${jtLabel}</span>`;
+        
+        switchTab('dashboard');
+        
+        // Reset Setup
+        document.getElementById('system-status').innerText = "Running";
+        document.getElementById('system-status').className = "text-xs font-bold text-secondary uppercase font-headline";
+        document.getElementById('status-dot').className = "w-2 h-2 rounded-full bg-secondary animate-pulse";
+        document.getElementById('terminal').innerHTML = "";
+        
+        document.getElementById('timer-status').innerText = "ACTIVE";
+        document.getElementById('timer-status').className = "text-[10px] font-mono text-secondary uppercase tracking-tighter";
+        
+        const jobId = "DX-" + Math.floor(Math.random()*90000 + 10000);
+        document.getElementById('job-id-text').innerText = "Job ID: #" + jobId;
+        document.getElementById('job-time-text').innerText = "Started " + new Date().toLocaleTimeString('en-US');
+        
+        document.getElementById('metric-target').innerText = target;
+        document.getElementById('metric-found').innerText = "0";
+        document.getElementById('metric-percent').innerText = "0%";
+        document.getElementById('metric-bar').style.width = "0%";
+        
+        // Launch Timer
+        if (timerInterval) clearInterval(timerInterval);
+        startTime = Date.now();
+        timerInterval = setInterval(() => {
+            const elapsedSeconds = Math.floor((Date.now() - startTime) / 1000);
+            const m = String(Math.floor(elapsedSeconds / 60)).padStart(2, '0');
+            const s = String(elapsedSeconds % 60).padStart(2, '0');
+            document.getElementById('elapsed-time').innerText = m + ":" + s;
+            
+            // Animate circular ring (60s rotation)
+            const circumference = 552.92;
+            const progress = (elapsedSeconds % 60) / 60;
+            const offset = circumference - (progress * circumference);
+            document.getElementById('timer-ring').style.strokeDashoffset = offset;
+        }, 1000);
+
+        // Launch API
+        const resp = await fetch("/api/start", {
+            method: "POST",
+            headers: {"Content-Type": "application/json"},
+            body: JSON.stringify({
+                target_leads: target,
+                search_terms: terms,
+                strictness: strictness,
+                job_type: jobType
+            })
+        });
+
+        // Brain Log Polling
+        if (bouncerLogInterval) clearInterval(bouncerLogInterval);
+        bouncerLogInterval = setInterval(refreshBouncerLog, 2000);
+
+        // Open SSE connection
+        if (eventSource) eventSource.close();
+        eventSource = new EventSource("/api/stream");
+        
+        eventSource.onmessage = function(event) {
+            const data = JSON.parse(event.data);
+            appendLog(data);
+            
+            // update metrics
+            if(data.type === "stats") {
+                document.getElementById('stat-scraped').innerText = data.scraped;
+                // Never let verified counter go backwards (high-water mark)
+                let currentVerified = parseInt(document.getElementById('stat-verified').innerText) || 0;
+                let newVerified = Math.max(data.verified, currentVerified);
+                document.getElementById('stat-verified').innerText = newVerified;
+                document.getElementById('stat-rejected').innerText = data.rejected;
+                document.getElementById('metric-found').innerText = newVerified;
+                
+                // Update Progress bar
+                let pct = (newVerified / target) * 100;
+                if(pct > 100) pct = 100;
+                document.getElementById('metric-percent').innerText = pct.toFixed(1) + "%";
+                document.getElementById('metric-bar').style.width = pct + "%";
+                
+            } else if (data.type === "info" && data.message.includes("Loop ")) {
+                 const m = data.message.match(/Loop (\d+)/);
+                 if (m) document.getElementById('metric-batch').innerText = m[1];
+            } else if (data.type === "done") {
+                document.getElementById('system-status').innerText = "Complete";
+                document.getElementById('system-status').className = "text-xs font-bold text-[#adc6ff] uppercase font-headline";
+                document.getElementById('status-dot').className = "w-2 h-2 rounded-full bg-[#adc6ff]";
+                clearInterval(timerInterval);
+                if (bouncerLogInterval) clearInterval(bouncerLogInterval);
+                document.getElementById('timer-status').innerText = "FINISHED";
+                document.getElementById('timer-status').className = "text-[10px] font-mono text-[#adc6ff] uppercase tracking-tighter";
+                
+                document.getElementById('btn-stop-dashboard').classList.add('hidden');
+                document.getElementById('btn-engage-dashboard').classList.remove('hidden');
+                
+                eventSource.close();
+            }
+        };
+    }
+    
+    function stopEngine() {
+        engineRunning = false;
+        
+        // Kill the backend task
+        fetch('/api/stop', { method: 'POST' }).catch(e => console.error(e));
+        
+        if(timerInterval) clearInterval(timerInterval);
+        if(bouncerLogInterval) clearInterval(bouncerLogInterval);
+        if(eventSource) eventSource.close();
+        
+        document.getElementById('btn-stop-dashboard').classList.add('hidden');
+        document.getElementById('btn-engage-dashboard').classList.remove('hidden');
+        
+        document.getElementById('system-status').innerText = "Paused";
+        document.getElementById('system-status').className = "text-xs font-bold text-red-400 uppercase font-headline";
+        document.getElementById('status-dot').className = "w-2 h-2 rounded-full bg-red-400";
+        document.getElementById('timer-status').innerText = "PAUSED";
+        appendLog({type: 'rejected', message: 'Engine force stopped by user.'});
+    }
+
+    function appendLog(data) {
+        if(data.type === 'stats' || data.type === 'done') return;
+        
+        const term = document.getElementById('terminal');
+        const now = new Date().toLocaleTimeString('en-US', { hour12: false });
+        
+        let colorClass = "text-on-surface-variant";
+        let prefix = "[INFO]";
+        
+        if(data.type === 'verified') { colorClass = "text-secondary"; prefix = "[VERIFIED]"; }
+        if(data.type === 'rejected') { colorClass = "text-[#ff5451]"; prefix = "[REJECTED]"; }
+        if(data.type === 'scrape') { colorClass = "text-primary"; prefix = "[SCRAPE]"; }
+        if(data.type === 'connected') { colorClass = "text-[#22c55e]"; prefix = "[CONNECTED]"; }
+        
+        const html = `
+            <div class="flex gap-4">
+                <span class="text-outline-variant opacity-50 shrink-0">${now}</span>
+                <span class="${colorClass} uppercase font-bold shrink-0">${prefix}</span>
+                <span class="text-on-surface-variant">${data.message}</span>
+            </div>
+        `;
+        term.insertAdjacentHTML('beforeend', html);
+        term.scrollTop = term.scrollHeight;
+    }
+    // ── Resume Info ──
+    let _resumeText = '';
+
+    async function loadResumeStatus() {
+        try {
+            const r = await fetch('/api/resume');
+            const d = await r.json();
+            if (d.exists && d.chars > 0) {
+                _resumeText = d.text;
+                setResumeLoaded(d.filename || 'resume.txt', d.chars);
+            } else {
+                setResumeEmpty();
+            }
+        } catch(e) { setResumeEmpty(); }
+    }
+
+    function setResumeLoaded(filename, chars) {
+        document.getElementById('resume-filename').innerText = filename;
+        document.getElementById('resume-status-dot').className = 'w-2 h-2 rounded-full bg-secondary';
+        document.getElementById('resume-status-text').innerText = 'Content: RESUME_FM_PROFILE.TXT';
+        document.getElementById('resume-status-text').className = 'text-[11px] font-mono text-secondary uppercase tracking-widest';
+        // Bar: scale chars to 100% at ~5000 chars
+        const pct = Math.min(100, Math.round((chars / 5000) * 100));
+        document.getElementById('resume-char-bar').style.width = pct + '%';
+        document.getElementById('resume-char-pct').innerText = pct + '%';
+        document.getElementById('resume-char-count').innerText = chars.toLocaleString() + ' characters';
+    }
+
+    function setResumeEmpty() {
+        _resumeText = '';
+        document.getElementById('resume-filename').innerText = 'No file loaded';
+        document.getElementById('resume-status-dot').className = 'w-2 h-2 rounded-full bg-outline';
+        document.getElementById('resume-status-text').innerText = 'Not loaded';
+        document.getElementById('resume-status-text').className = 'text-[11px] font-mono text-outline uppercase tracking-widest';
+        document.getElementById('resume-char-bar').style.width = '0%';
+        document.getElementById('resume-char-pct').innerText = '0%';
+        document.getElementById('resume-char-count').innerText = '0 characters';
+    }
+
+    async function uploadResume(file) {
+        if (!file) return;
+        const formData = new FormData();
+        formData.append('file', file);
+        document.getElementById('resume-status-text').innerText = 'Uploading...';
+        try {
+            const r = await fetch('/api/resume', { method: 'POST', body: formData });
+            const d = await r.json();
+            if (d.status === 'ok') {
+                // Read text locally too for preview
+                const reader = new FileReader();
+                reader.onload = e => { _resumeText = e.target.result; };
+                reader.readAsText(file);
+                setResumeLoaded(file.name, d.chars);
+            }
+        } catch(e) {
+            document.getElementById('resume-status-text').innerText = 'Upload failed';
+        }
+    }
+
+    function handleResumeDrop(event) {
+        event.preventDefault();
+        const dz = document.getElementById('resume-drop-zone');
+        dz.classList.remove('border-primary','bg-primary/10');
+        const file = event.dataTransfer.files[0];
+        if (file && /\.(pdf|docx|doc|odt|txt)$/i.test(file.name)) uploadResume(file);
+    }
+
+    function previewResume() {
+        if (!_resumeText) { alert('No resume loaded yet.'); return; }
+        document.getElementById('resume-preview-text').innerText = _resumeText;
+        document.getElementById('resume-modal').classList.remove('hidden');
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+        loadResumeStatus();
+        loadBrainData();
+
+        // Add listeners for main config radio buttons
+        const setupRadioGroup = (name) => {
+            document.querySelectorAll(`input[name="${name}"]`).forEach(r => {
+                r.addEventListener('change', () => {
+                    document.querySelectorAll(`input[name="${name}"]`).forEach(radio => {
+                        const isChecked = radio.checked;
+                        radio.parentElement.className = isChecked 
+                            ? "flex-1 bg-surface-container-lowest p-4 rounded-[2rem] border border-primary cursor-pointer hover:border-primary/50 transition-all flex items-center gap-3"
+                            : "flex-1 bg-surface-container-lowest p-4 rounded-[2rem] border border-outline-variant/30 cursor-pointer hover:border-primary/50 transition-all flex items-center gap-3";
+                        radio.nextElementSibling.className = isChecked
+                            ? "font-headline uppercase text-[10px] sm:text-xs font-bold text-primary"
+                            : "font-headline uppercase text-[10px] sm:text-xs font-bold text-white";
+                    });
+                });
+                // Initial state
+                if(r.checked) r.dispatchEvent(new Event('change'));
+            });
+        };
+        setupRadioGroup('strictness');
+        setupRadioGroup('job_type');
+    });
+
+    let _currentViewDetail = null;
+
+    function viewLeadDetails(idx, type) {
+        const data = type === 'verified' ? _metricsResultsVerified : _metricsResultsRejected;
+        const item = data[idx];
+        if (!item) return;
+
+        _currentViewDetail = item;
+
+        document.getElementById('detail-title').innerText = item.title || 'Untitled Role';
+        document.getElementById('detail-company').innerText = item.website || 'Unknown Company';
+        document.getElementById('detail-budget').innerText = item.budget || 'N/A';
+        document.getElementById('detail-posted').innerText = item.posted || 'N/A';
+        document.getElementById('detail-reason').innerText = item.match_reason || 'No detailed reason provided.';
+        document.getElementById('detail-share').innerText = item.share_items || 'Standard CV';
+        document.getElementById('detail-apply').innerText = item.apply_method || 'Visit Website';
+        document.getElementById('detail-email').innerText = item.email || 'None found';
+        document.getElementById('detail-phone').innerText = item.phone || 'None found';
+        
+        // Match Score mapping
+        let score = parseInt(item.match_score) || 0;
+        if (isNaN(parseInt(item.match_score))) {
+            const s = (item.match_score || "").toLowerCase();
+            if (s.includes("high")) score = 95;
+            else if (s.includes("medium")) score = 75;
+            else if (s.includes("low")) score = 45;
+        }
+        
+        const scoreBar = document.getElementById('detail-score-bar');
+        const scoreText = document.getElementById('detail-score-text');
+        scoreBar.style.width = score + '%';
+        scoreText.innerText = score + '% Match';
+        
+        if (score > 85) scoreBar.className = "h-full bg-primary transition-all duration-700";
+        else if (score > 60) scoreBar.className = "h-full bg-secondary transition-all duration-700";
+        else scoreBar.className = "h-full bg-red-400 transition-all duration-700";
+
+        // Reset draft view
+        document.getElementById('draft-container').classList.add('hidden');
+        document.getElementById('draft-text').value = '';
+        document.getElementById('btn-draft-ai').innerHTML = '<span class="material-symbols-outlined text-sm">auto_awesome</span> Draft Application With AI';
+        document.getElementById('btn-draft-ai').disabled = false;
+
+        document.getElementById('lead-detail-modal').classList.remove('hidden');
+    }
+
+    function closeLeadModal() {
+        document.getElementById('lead-detail-modal').classList.add('hidden');
+        _currentViewDetail = null;
+    }
+
+    async function draftWithAI() {
+        if (!_currentViewDetail) return;
+        
+        const btn = document.getElementById('btn-draft-ai');
+        const container = document.getElementById('draft-container');
+        const textarea = document.getElementById('draft-text');
+        
+        btn.disabled = true;
+        btn.innerHTML = '<span class="material-symbols-outlined text-sm animate-spin">sync</span> AI Engine Drafting...';
+        
+        try {
+            const r = await fetch('/api/job/draft', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({
+                    title: _currentViewDetail.title,
+                    company: _currentViewDetail.website,
+                    reason: _currentViewDetail.match_reason,
+                    budget: _currentViewDetail.budget
+                })
+            });
+            const d = await r.json();
+            if (d.draft) {
+                textarea.value = d.draft;
+                container.classList.remove('hidden');
+                btn.innerHTML = '<span class="material-symbols-outlined text-sm text-secondary">check_circle</span> Application Drafted';
+            } else {
+                alert('Ollama was unable to generate a draft. Ensure the model is running.');
+                btn.innerHTML = '<span class="material-symbols-outlined text-sm">auto_awesome</span> Draft Application With AI';
+                btn.disabled = false;
+            }
+        } catch(e) {
+            alert('Drafting failed: ' + e.message);
+            btn.disabled = false;
+            btn.innerHTML = '<span class="material-symbols-outlined text-sm">auto_awesome</span> Draft Application With AI';
+        }
+    }
+
+    function copyDraft() {
+        const text = document.getElementById('draft-text').value;
+        navigator.clipboard.writeText(text);
+        const btn = document.getElementById('btn-copy-draft');
+        const old = btn.innerHTML;
+        btn.innerHTML = '<span class="material-symbols-outlined text-sm">done</span> COPIED';
+        setTimeout(() => btn.innerHTML = old, 2000);
+    }
+</script>
+
+<!-- Lead Detail Modal -->
+<div id="lead-detail-modal" class="hidden fixed inset-0 z-[110] flex items-center justify-center bg-black/60 backdrop-blur-md p-6 transition-all duration-500 ease-out">
+    <div class="bg-surface-container-low border border-white/10 rounded-[2.5rem] w-full max-w-4xl max-h-[90vh] flex flex-col shadow-[0_0_50px_rgba(0,0,0,0.5)] overflow-hidden active-modal-ring animate-slide-up">
+        <div class="flex items-center justify-between px-10 py-6 border-b border-white/5 bg-white/[0.02]">
+            <div class="flex items-center gap-4">
+                <div class="w-12 h-12 rounded-3xl bg-primary/10 border border-primary/20 flex items-center justify-center text-primary">
+                    <span class="material-symbols-outlined text-2xl">visibility</span>
+                </div>
+                <div>
+                    <h2 id="detail-title" class="text-xl font-headline font-black text-white leading-tight">Video Lead Detailed Intelligence</h2>
+                    <p id="detail-company" class="text-outline text-xs uppercase tracking-widest font-bold">Source Analyzed By JobMan AI</p>
+                </div>
+            </div>
+            <button onclick="closeLeadModal()" class="w-10 h-10 rounded-full hover:bg-white/10 flex items-center justify-center text-outline transition-all">
+                <span class="material-symbols-outlined">close</span>
+            </button>
+        </div>
+        
+        <div class="flex-1 overflow-y-auto p-10 no-scrollbar">
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-12">
+                <!-- Left Section: Hard Stats -->
+                <div class="space-y-8">
+                    <div class="space-y-2">
+                        <label class="text-[10px] font-headline font-bold text-outline-variant uppercase tracking-[0.25em]">Resume Match Analysis</label>
+                        <div class="flex items-center gap-4">
+                            <div class="flex-1 h-2 bg-white/5 rounded-full overflow-hidden">
+                                <div id="detail-score-bar" class="h-full bg-primary transition-all duration-700" style="width: 0%"></div>
+                            </div>
+                            <span id="detail-score-text" class="text-white font-mono text-sm font-bold">0% Match</span>
+                        </div>
+                    </div>
+                    
+                    <div class="grid grid-cols-2 gap-6">
+                        <div class="p-5 bg-surface-container-lowest rounded-3xl border border-white/5">
+                            <label class="block text-[9px] text-outline uppercase font-black mb-1">Financial Offer</label>
+                            <p id="detail-budget" class="text-white font-mono font-bold">N/A</p>
+                        </div>
+                        <div class="p-5 bg-surface-container-lowest rounded-3xl border border-white/5">
+                            <label class="block text-[9px] text-outline uppercase font-black mb-1">Posted Period</label>
+                            <p id="detail-posted" class="text-outline-variant text-sm font-medium">N/A</p>
+                        </div>
+                    </div>
+
+                    <div class="p-6 bg-primary/5 rounded-3xl border border-primary/10">
+                        <label class="block text-[10px] text-primary uppercase font-bold tracking-widest mb-3">AI Deep Reason</label>
+                        <p id="detail-reason" class="text-on-surface-variant font-body text-sm leading-relaxed italic">Analyzing the fit parameters...</p>
+                    </div>
+
+                    <div class="flex flex-wrap gap-3">
+                        <button onclick="window.open(_currentViewDetail.url, '_blank')" class="flex-1 py-4 bg-white text-black rounded-[2.5rem] font-headline font-black uppercase text-xs tracking-widest hover:scale-[1.02] active:scale-95 transition-all shadow-xl">
+                            <span class="material-symbols-outlined text-sm align-middle mr-1">open_in_new</span> Open Site
+                        </button>
+                        <button id="btn-draft-ai" onclick="draftWithAI()" class="flex-1 py-4 bg-primary text-on-primary-container rounded-[2.5rem] font-headline font-black uppercase text-xs tracking-widest hover:brightness-110 active:scale-95 transition-all shadow-xl flex items-center justify-center gap-2">
+                           <span class="material-symbols-outlined text-sm">auto_awesome</span> Draft Application With AI
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Right Section: Logistics & Contact -->
+                <div class="space-y-8">
+                    <div class="grid grid-cols-1 gap-4">
+                        <div class="flex items-center gap-4 p-4 bg-white/[0.03] rounded-3xl border border-white/5 hover:bg-white/[0.06] transition-all">
+                            <div class="w-10 h-10 rounded-2xl bg-secondary/10 flex items-center justify-center text-secondary border border-secondary/20">
+                                <span class="material-symbols-outlined text-xl">share</span>
+                            </div>
+                            <div>
+                                <label class="block text-[9px] text-outline uppercase font-bold">Asset Items Recommended</label>
+                                <p id="detail-share" class="text-white text-sm font-bold">Portfolio / CV / Reels</p>
+                            </div>
+                        </div>
+                        <div class="flex items-center gap-4 p-4 bg-white/[0.03] rounded-3xl border border-white/5 hover:bg-white/[0.06] transition-all">
+                            <div class="w-10 h-10 rounded-2xl bg-primary/10 flex items-center justify-center text-primary border border-primary/20">
+                                <span class="material-symbols-outlined text-xl">how_to_reg</span>
+                            </div>
+                            <div>
+                                <label class="block text-[9px] text-outline uppercase font-bold">Filing Protocol</label>
+                                <p id="detail-apply" class="text-white text-sm font-bold">Internal Form Submission</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="p-8 bg-surface-container-low rounded-3xl border border-white/5 space-y-4">
+                        <h4 class="text-xs font-headline font-bold text-white uppercase tracking-widest">Communication Intelligence</h4>
+                        <div class="space-y-3">
+                            <div class="flex justify-between items-center text-sm">
+                                <span class="text-outline">Extracted Email:</span>
+                                <span id="detail-email" class="text-secondary font-mono font-bold select-all">None</span>
+                            </div>
+                            <div class="flex justify-between items-center text-sm">
+                                <span class="text-outline">Direct Phone:</span>
+                                <span id="detail-phone" class="text-white font-mono font-bold select-all">None</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- AI Draft Result View (Hidden by default) -->
+                    <div id="draft-container" class="hidden space-y-4 animate-slide-up">
+                        <div class="flex items-center justify-between">
+                            <label class="text-[10px] font-headline font-bold text-primary uppercase tracking-[0.25em]">AI Drafted Application</label>
+                            <button id="btn-copy-draft" onclick="copyDraft()" class="text-[10px] text-outline hover:text-white uppercase font-black tracking-widest flex items-center gap-1 transition-colors">
+                                <span class="material-symbols-outlined text-sm">content_copy</span> COPY TO CLIPBOARD
+                            </button>
+                        </div>
+                        <textarea id="draft-text" readonly class="w-full h-48 bg-[#0a0a0a] border border-primary/30 rounded-3xl p-5 text-sm font-body leading-relaxed text-on-surface-variant focus:outline-none no-scrollbar resize-none"></textarea>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Resume Preview Modal -->
+<div id="resume-modal" class="hidden fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm p-6">
+    <div class="bg-surface-container-low border border-white/10 rounded-[2.5rem] w-full max-w-2xl max-h-[80vh] flex flex-col shadow-2xl">
+        <div class="flex items-center justify-between px-6 py-4 border-b border-white/5">
+            <div class="flex items-center gap-3">
+                <span class="material-symbols-outlined text-primary">description</span>
+                <span class="font-headline font-bold text-white uppercase tracking-tight">Resume Preview</span>
+            </div>
+            <button onclick="document.getElementById('resume-modal').classList.add('hidden')" class="text-outline hover:text-white transition-colors">
+                <span class="material-symbols-outlined">close</span>
+            </button>
+        </div>
+        <div class="overflow-y-auto flex-1 p-6">
+            <pre id="resume-preview-text" class="font-mono text-sm text-on-surface-variant whitespace-pre-wrap leading-relaxed"></pre>
+        </div>
+    </div>
+</div>
+</body>
+</html>

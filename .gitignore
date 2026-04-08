@@ -1,0 +1,27 @@
+# === User Data & Private Leads ===
+resume.txt
+output/
+stitch/
+queries.txt
+config.json
+
+# === Python & Build Artifacts ===
+__pycache__/
+*.py[cod]
+*$py.class
+venv/
+.env
+
+# === Distribution & Compiler Output ===
+build/
+dist/
+*.spec
+JobMan.exe
+
+# === Inno Setup Temporary files ===
+Output/
+
+# === Agent Metadata ===
+.gemini/
+.agent/
+.antigravity/
