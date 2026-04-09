@@ -17,3 +17,5 @@ psutil==6.1.1
 GPUtil==1.4.0
 rich==13.9.4
 pyinstaller==6.11.0
+beautifulsoup4==4.12.3
+crawl4ai==0.3.73

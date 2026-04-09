@@ -21,7 +21,6 @@ def build_jobman():
         '--name=JobMan',
         f'--add-data=templates{sep}templates',
         f'--add-data=static{sep}static',
-        '--collect-all=crawl4ai',  # Critical: Collect all submodules and data for crawler
         '--collect-all=chardet',   # Ensure chardet is fully included
         '--hidden-import=chardet',
         '--hidden-import=numpy._core', # Mandatory for NumPy 2.x on Python 3.13
@@ -51,13 +50,14 @@ def build_jobman():
 if __name__ == "__main__":
     # Ensure dependencies are installed for the build
     print("Checking build dependencies...")
-    # These versions are critical for Python 3.13 stability and crawl4ai 0.8.6
+    # These versions are critical for Python 3.13 stability
     subprocess.run([sys.executable, "-m", "pip", "install", 
                    "pyinstaller==6.11.0", 
                    "chardet==6.0.0", 
                    "numpy==2.1.0", 
                    "psutil==6.1.1", 
                    "pydantic==2.10.0", 
-                   "rich==13.9.4"])
+                   "rich==13.9.4",
+                   "beautifulsoup4==4.12.3"])
         
     build_jobman()

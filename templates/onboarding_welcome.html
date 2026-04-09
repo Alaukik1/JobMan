@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html class="dark" lang="en">
+<head>
+    <meta charset="utf-8"/>
+    <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+    <title>JobMan | Initialization</title>
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=Inter:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet"/>
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+    <script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "primary": "#adc6ff",
+                        "primary-container": "#4d8eff",
+                        "surface": "#131313",
+                        "on-surface": "#e5e2e1",
+                        "on-surface-variant": "#c2c6d6",
+                        "outline-variant": "#424754",
+                        "secondary": "#4edea3",
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.125rem",
+                    },
+                    "fontFamily": {
+                        "headline": ["Space Grotesk"],
+                        "body": ["Inter"],
+                        "mono": ["JetBrains Mono"]
+                    }
+                },
+            },
+        }
+    </script>
+    <style>
+        .material-symbols-outlined { font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24; }
+        .hero-gradient { background: radial-gradient(circle at center, rgba(173, 198, 255, 0.08) 0%, rgba(19, 19, 19, 0) 70%); }
+        .glow-pulse { box-shadow: 0 0 40px rgba(173, 198, 255, 0.15); }
+        body { background-color: #131313; color: #e5e2e1; overflow: hidden; }
+    </style>
+</head>
+<body class="font-body selection:bg-primary/30">
+    <main class="relative min-h-screen w-full flex flex-col items-center justify-center overflow-hidden">
+        <div class="absolute inset-0 hero-gradient pointer-events-none"></div>
+        
+        <!-- Identity Header -->
+        <div class="absolute top-12 left-12 flex items-center gap-4">
+            <div class="w-8 h-8 bg-[#353534] flex items-center justify-center rounded-sm">
+                <span class="material-symbols-outlined text-primary text-sm">terminal</span>
+            </div>
+            <span class="font-headline font-bold tracking-tighter text-primary uppercase text-sm">JOBMAN_OS</span>
+        </div>
+
+        <div class="absolute top-12 right-12 flex items-center gap-6">
+            <span class="font-mono text-[10px] text-[#8c909f] tracking-[0.2em] uppercase">SYSTEM_STATUS: READY</span>
+            <div class="flex items-center gap-2">
+                <div class="w-1.5 h-1.5 rounded-full bg-secondary"></div>
+                <span class="font-mono text-[10px] text-secondary tracking-[0.2em] uppercase">STABLE</span>
+            </div>
+        </div>
+
+        <!-- Hero Content -->
+        <div class="z-10 flex flex-col items-center text-center max-w-3xl px-6">
+            <div class="mb-16 relative">
+                <div class="w-24 h-24 rounded-full border border-primary/20 flex items-center justify-center glow-pulse relative">
+                    <div class="absolute inset-0 bg-primary/5 rounded-full animate-pulse"></div>
+                    <span class="material-symbols-outlined text-primary text-4xl" style="font-variation-settings: 'FILL' 1;">adjust</span>
+                </div>
+                <div class="absolute -top-4 -right-12 font-mono text-[10px] text-outline-variant tracking-widest">v1.0.0_PRODUCTION</div>
+                <div class="absolute -bottom-4 -left-12 font-mono text-[10px] text-outline-variant tracking-widest">ARCH_X64</div>
+            </div>
+
+            <h1 class="font-mono text-4xl md:text-6xl font-medium tracking-tighter text-on-surface mb-6 uppercase">
+                WELCOME TO <span class="text-primary">JOBMAN</span>
+            </h1>
+            <p class="text-on-surface-variant font-body text-lg md:text-xl max-w-xl leading-relaxed opacity-80 mb-12">
+                Your autonomous loop-back engine for the modern job market. Orchestrate applications with surgical precision.
+            </p>
+
+            <div class="flex flex-col items-center gap-4">
+                <button id="initialize-btn" class="group relative px-10 py-5 bg-gradient-to-br from-primary to-primary-container rounded-md flex items-center gap-4 transition-all duration-300 hover:scale-[1.02] active:scale-95 shadow-[0_0_30px_rgba(77,142,255,0.3)]">
+                    <span class="font-headline font-bold text-[#002e6a] tracking-widest text-sm uppercase">INITIALIZE WORKSPACE</span>
+                    <span class="material-symbols-outlined text-[#002e6a] group-hover:translate-x-1 transition-transform">chevron_right</span>
+                </button>
+            </div>
+        </div>
+
+        <!-- Lower Decorators -->
+        <div class="absolute bottom-0 w-full px-12 py-8 flex justify-between items-end">
+            <div class="flex flex-col gap-2 max-w-xs text-left">
+                <div class="h-[2px] w-12 bg-primary"></div>
+                <p class="font-mono text-[9px] text-outline-variant leading-tight uppercase tracking-tight">
+                    ESTABLISHING SECURE CONNECTION TO GLOBAL JOB REPOSITORIES...<br/>
+                    ENCRYPTING SESSION DATA...<br/>
+                    WAITING FOR OPERATOR INPUT.
+                </p>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        document.getElementById('initialize-btn').addEventListener('click', () => {
+            // Transition to Analysis Screen (Screen 2)
+            window.location.href = '/onboarding/analysis';
+        });
+    </script>
+</body>
+</html>

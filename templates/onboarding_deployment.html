@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html class="dark" lang="en">
+<head>
+    <meta charset="utf-8"/>
+    <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+    <title>JobMan | Deployment Ready</title>
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet"/>
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+    <script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "primary": "#adc6ff",
+                        "primary-container": "#4d8eff",
+                        "surface": "#131313",
+                        "on-surface": "#e5e2e1",
+                        "on-surface-variant": "#c2c6d6",
+                        "outline-variant": "#424754",
+                        "secondary": "#4edea3",
+                        "surface-container-low": "#1c1b1b",
+                        "surface-container-high": "#2a2a2a",
+                        "surface-container-lowest": "#0e0e0e",
+                    },
+                    "fontFamily": {
+                        "headline": ["Space Grotesk"],
+                        "body": ["Inter"],
+                        "mono": ["JetBrains Mono"]
+                    }
+                },
+            },
+        }
+    </script>
+    <style>
+        .material-symbols-outlined { font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24; }
+        .glass-panel { background: rgba(42, 42, 42, 0.6); backdrop-filter: blur(20px); }
+    </style>
+</head>
+<body class="bg-[#131313] text-on-surface font-body selection:bg-primary/30 antialiased overflow-hidden">
+    <div class="flex h-screen overflow-hidden">
+        <!-- Sidebar -->
+        <aside class="hidden lg:flex flex-col h-full py-8 bg-[#1c1b1b] w-64 border-r border-[#424754]/15">
+            <div class="px-6 mb-12">
+                <div class="font-headline font-black text-primary text-2xl tracking-tighter">NODE_01</div>
+                <div class="flex items-center gap-2 mt-1 opacity-80 text-[10px] uppercase tracking-widest">
+                    <span class="w-2 h-2 rounded-full bg-secondary"></span>
+                    <span>OPERATIONAL</span>
+                </div>
+            </div>
+            <nav class="flex-1 space-y-1">
+                <div class="flex items-center gap-4 px-6 py-4 bg-[#2a2a2a] text-primary font-bold border-l-4 border-primary">
+                    <span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">rocket_launch</span>
+                    <span class="text-[10px] uppercase tracking-widest">Deployment</span>
+                </div>
+            </nav>
+        </aside>
+
+        <main class="flex-1 flex flex-col min-w-0 bg-[#131313] relative overflow-y-auto">
+            <header class="flex justify-between items-center w-full px-6 h-16 border-b border-[#424754]/15 bg-[#131313] sticky top-0 z-50">
+                <div class="text-xl font-bold tracking-tighter text-primary uppercase font-headline">JOBMAN_OS</div>
+                <div class="flex items-center gap-4">
+                    <div class="w-8 h-8 rounded-full bg-[#353534] overflow-hidden">
+                         <span class="material-symbols-outlined text-primary flex items-center justify-center h-full">person</span>
+                    </div>
+                </div>
+            </header>
+
+            <div class="flex-1 p-8 pb-32">
+                <div class="max-w-5xl mx-auto space-y-12">
+                    <!-- Header Section -->
+                    <div class="flex flex-col items-center text-center space-y-4">
+                        <div class="inline-flex items-center gap-2 px-3 py-1 bg-secondary/10 border border-secondary/20 rounded-full text-secondary font-mono text-[10px] tracking-widest uppercase">
+                            <span class="w-2 h-2 rounded-full bg-secondary animate-pulse"></span>
+                            Deployment Ready
+                        </div>
+                        <h1 class="text-5xl font-headline font-bold tracking-tighter text-on-surface uppercase">System Synchronization Complete</h1>
+                        <p class="text-on-surface-variant max-w-xl text-lg font-light leading-relaxed">
+                            The architectural integrity of <span class="text-primary font-medium">NODE_01</span> has been verified. All modules are primed for immediate operational execution.
+                        </p>
+                    </div>
+
+                    <!-- Status Bento Grid -->
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                        <div class="glass-panel p-8 rounded-xl border border-outline-variant/10 flex flex-col items-center text-center">
+                            <div class="w-16 h-16 rounded-full bg-secondary/10 flex items-center justify-center mb-6 ring-4 ring-secondary/5">
+                                <span class="material-symbols-outlined text-secondary text-3xl" style="font-variation-settings: 'FILL' 1;">check_circle</span>
+                            </div>
+                            <h3 class="font-headline text-xl font-bold mb-2">System</h3>
+                            <p class="text-on-surface-variant text-sm">Core infrastructure verified.</p>
+                        </div>
+                        <div class="glass-panel p-8 rounded-xl border border-outline-variant/10 flex flex-col items-center text-center">
+                            <div class="w-16 h-16 rounded-full bg-secondary/10 flex items-center justify-center mb-6 ring-4 ring-secondary/5">
+                                <span class="material-symbols-outlined text-secondary text-3xl" style="font-variation-settings: 'FILL' 1;">settings_input_component</span>
+                            </div>
+                            <h3 class="font-headline text-xl font-bold mb-2">Engine</h3>
+                            <p class="text-on-surface-variant text-sm">Logic paths validated.</p>
+                        </div>
+                        <div class="glass-panel p-8 rounded-xl border border-outline-variant/10 flex flex-col items-center text-center">
+                            <div class="w-16 h-16 rounded-full bg-secondary/10 flex items-center justify-center mb-6 ring-4 ring-secondary/5">
+                                <span class="material-symbols-outlined text-secondary text-3xl" style="font-variation-settings: 'FILL' 1;">psychology</span>
+                            </div>
+                            <h3 class="font-headline text-xl font-bold mb-2">Intelligence</h3>
+                            <p class="text-on-surface-variant text-sm">Weights optimized.</p>
+                        </div>
+                    </div>
+
+                    <!-- CTA Center -->
+                    <div class="flex flex-col items-center justify-center pt-8 space-y-6">
+                        <button id="finalize-btn" class="relative group">
+                            <div class="absolute -inset-1 bg-gradient-to-r from-primary to-primary-container rounded-lg blur opacity-30 group-hover:opacity-60 transition duration-1000 group-hover:duration-200"></div>
+                            <div class="relative px-12 py-6 bg-gradient-to-br from-primary to-primary-container text-[#002e6a] rounded-lg flex items-center gap-4 transition-transform group-hover:scale-[1.02] active:scale-95">
+                                <span class="font-headline text-2xl font-black tracking-widest uppercase">START THE HUNT</span>
+                                <span class="material-symbols-outlined text-3xl">target</span>
+                            </div>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        document.getElementById('finalize-btn').addEventListener('click', async () => {
+             // 1. Tell backend we are done (creates resume.txt & config.json)
+             const resp = await fetch('/api/setup/finalize', { method: 'POST' });
+             if (resp.ok) {
+                 // 2. Redirect to Dashboard
+                 window.location.href = '/';
+             }
+        });
+    </script>
+</body>
+</html>

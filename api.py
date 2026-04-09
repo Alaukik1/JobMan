@@ -44,7 +44,40 @@ global_queue = asyncio.Queue()
 
 @app.get("/", response_class=HTMLResponse)
 async def get_index(request: Request):
+    # If config doesn't exist or resume isn't set, force onboarding
+    if not os.path.exists("config.json") or not os.path.exists("resume.txt"):
+        return templates.TemplateResponse("onboarding_welcome.html", {"request": request})
     return templates.TemplateResponse("index.html", {"request": request})
+
+@app.get("/onboarding/analysis", response_class=HTMLResponse)
+async def get_onboarding_analysis(request: Request):
+    return templates.TemplateResponse("onboarding_analysis.html", {"request": request})
+
+@app.get("/onboarding/sync", response_class=HTMLResponse)
+async def get_onboarding_sync(request: Request):
+    return templates.TemplateResponse("onboarding_sync.html", {"request": request})
+
+@app.get("/onboarding/probe", response_class=HTMLResponse)
+async def get_onboarding_probe(request: Request):
+    return templates.TemplateResponse("onboarding_probe.html", {"request": request})
+
+@app.get("/onboarding/deployment", response_class=HTMLResponse)
+async def get_onboarding_deployment(request: Request):
+    return templates.TemplateResponse("onboarding_deployment.html", {"request": request})
+
+@app.post("/api/setup/finalize")
+async def finalize_setup():
+    # Mark setup as complete by creating the markers
+    with open("resume.txt", "w") as f:
+        f.write("Setup Complete")
+    
+    # Create a default config if missing
+    import json
+    if not os.path.exists("config.json"):
+        with open("config.json", "w") as f:
+            json.dump({"setup_complete": True, "initialized_at": str(os.path.getctime("resume.txt"))}, f)
+            
+    return JSONResponse(content={"status": "success"})
 
 @app.get("/api/logs")
 async def get_logs():
@@ -198,39 +231,54 @@ async def stream(request: Request):
                 break
     return EventSourceResponse(event_generator())
 
-# --- Setup Endpoints ---
+# --- Setup & Onboarding Endpoints ---
 
-@app.get("/api/setup/status")
-async def get_setup_status():
-    status = setup_manager.get_setup_status()
-    spec = setup_manager.audit_hardware()
-    status["specs"] = spec
-    status["recommended_model"] = setup_manager.recommend_model(spec)
-    return JSONResponse(content=status)
+@app.get("/api/setup/audit")
+async def get_setup_audit():
+    """Performs hardware audit and identifies recommended model."""
+    specs = setup_manager.get_hardware_specs()
+    installed = setup_manager.get_installed_models()
+    recommended = setup_manager.select_recommend_model(specs)
+    
+    return JSONResponse(content={
+        "specs": specs,
+        "installed_models": installed,
+        "recommended_model": recommended,
+        "is_ollama_alive": setup_manager.check_ollama_presence()
+    })
+
+@app.get("/api/setup/models")
+async def get_setup_models():
+    """Returns curated models for manual override and currently installed ones."""
+    return JSONResponse(content={
+        "preselected": setup_manager.get_preselected_models(),
+        "installed": setup_manager.get_installed_models()
+    })
 
 @app.post("/api/setup/install-ollama")
 async def install_ollama():
-    success = setup_manager.install_ollama_windows()
-    if success:
+    """Trigger invisible/visible install of Ollama."""
+    try:
+        setup_manager.install_ollama()
         return JSONResponse(content={"status": "success"})
-    return JSONResponse(content={"status": "error"}, status_code=500)
+    except Exception as e:
+        return JSONResponse(content={"status": "error", "message": str(e)}, status_code=500)
 
-@app.post("/api/setup/pull-model")
-async def pull_model(request: Request):
+@app.post("/api/setup/pull")
+async def setup_pull_model(request: Request, background_tasks: BackgroundTasks):
+    """Start pulling a model in the background."""
     data = await request.json()
-    model_name = data.get("model", "llama3:8b")
+    model_name = data.get("model")
+    if not model_name:
+        return JSONResponse(content={"status": "error", "message": "No model specified"}, status_code=400)
     
-    import threading
-    def run_pull():
-        import subprocess
-        subprocess.run(["ollama", "pull", model_name], capture_output=True)
-        
-    thread = threading.Thread(target=run_pull)
-    thread.start()
-    return JSONResponse(content={"status": "success"})
+    background_tasks.add_task(setup_manager.pull_model, model_name)
+    return JSONResponse(content={"status": "started", "model": model_name})
 
 @app.get("/api/setup/check-model")
-async def check_model(model: str = "llama3:8b"):
-    if setup_manager.is_model_pulled(model):
-        return JSONResponse(content={"ready": True})
-    return JSONResponse(content={"ready": False})
+async def check_model_ready(model: str):
+    """Check if a specific model is fully present in Ollama."""
+    installed = setup_manager.get_installed_models()
+    # Ollama tags often return "llama3:latest" even if requested as "llama3"
+    is_ready = any(model in m for m in installed)
+    return JSONResponse(content={"ready": is_ready})

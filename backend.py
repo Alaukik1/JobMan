@@ -355,27 +355,32 @@ async def ensure_ollama_alive(event_queue: asyncio.Queue):
     
     for attempt in range(6): # Retry for ~30 seconds
         try:
-            # Use to_thread to prevent blocking the async event loop during connection checks
             r = await asyncio.to_thread(requests.get, "http://127.0.0.1:11434/api/tags", timeout=3)
             if r.status_code == 200:
                 await event_queue.put({"type": "connected", "message": f"Connected to {model}"})
                 return True
         except requests.exceptions.RequestException:
             if attempt == 0:
-                await event_queue.put({"type": "info", "message": "Ollama not detected. Attempting to start engine..."})
+                await event_queue.put({"type": "info", "message": "Ollama not detected. Searching for engine..."})
                 ollama_path = await asyncio.to_thread(find_ollama_executable)
-                await event_queue.put({"type": "info", "message": f"Found Ollama at: {ollama_path}"})
-                try:
-                    subprocess.Popen(
-                        [ollama_path, "serve"],
-                        creationflags=subprocess.CREATE_NO_WINDOW | subprocess.DETACHED_PROCESS,
-                        stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL
-                    )
-                except Exception as e:
-                    await event_queue.put({"type": "rejected", "message": f"Failed to start Ollama: {str(e)}"})
+                if ollama_path == "ollama": # Fallback means not found in path
+                    await event_queue.put({"type": "info", "message": "Ollama engine missing. Launching Smart Setup..."})
+                    from setup_manager import setup_manager
+                    await asyncio.to_thread(setup_manager.install_ollama)
+                    await event_queue.put({"type": "info", "message": "Please follow the instructions in the setup window."})
+                else:
+                    await event_queue.put({"type": "info", "message": "Attempting to boot engine..."})
+                    try:
+                        subprocess.Popen(
+                            [ollama_path, "serve"],
+                            creationflags=subprocess.CREATE_NO_WINDOW | subprocess.DETACHED_PROCESS,
+                            stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL
+                        )
+                    except Exception as e:
+                        await event_queue.put({"type": "rejected", "message": f"Failed to start Ollama: {str(e)}"})
             await asyncio.sleep(5)
     
-    await event_queue.put({"type": "rejected", "message": "Ollama connection timeout. Please start Ollama manually."})
+    await event_queue.put({"type": "rejected", "message": "Connect timeout. Setup might still be in progress."})
     return False
 
 # =========================================================================

@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html class="dark" lang="en">
+<head>
+    <meta charset="utf-8"/>
+    <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+    <title>JobMan | Intelligence Probe</title>
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700;900&family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet"/>
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+    <script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "primary": "#adc6ff",
+                        "primary-container": "#4d8eff",
+                        "surface": "#131313",
+                        "on-surface": "#e5e2e1",
+                        "on-surface-variant": "#c2c6d6",
+                        "outline-variant": "#424754",
+                        "secondary": "#4edea3",
+                        "surface-container-low": "#1c1b1b",
+                        "surface-container-high": "#2a2a2a",
+                        "surface-container-lowest": "#0e0e0e",
+                    },
+                    "fontFamily": {
+                        "headline": ["Space Grotesk"],
+                        "body": ["Inter"],
+                        "mono": ["JetBrains Mono"]
+                    }
+                },
+            },
+        }
+    </script>
+    <style>
+        .material-symbols-outlined { font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24; }
+        .glass-panel { background: rgba(42, 42, 42, 0.6); backdrop-filter: blur(20px); }
+    </style>
+</head>
+<body class="bg-[#131313] text-on-surface font-body selection:bg-primary-container/30 antialiased overflow-hidden">
+    <div class="flex h-screen overflow-hidden">
+        <!-- Sidebar -->
+        <aside class="hidden lg:flex flex-col h-full py-8 bg-[#1c1b1b] w-64 border-r border-[#424754]/15">
+            <div class="px-6 mb-12">
+                <div class="font-headline font-black text-primary text-2xl tracking-tighter">NODE_01</div>
+                <div class="flex items-center gap-2 mt-1 opacity-80 text-[10px] uppercase tracking-widest">
+                    <span class="w-2 h-2 rounded-full bg-secondary"></span>
+                    <span>OPERATIONAL</span>
+                </div>
+            </div>
+            <nav class="flex-1 space-y-1">
+                <div class="flex items-center gap-4 px-6 py-4 bg-[#2a2a2a] text-primary font-bold border-l-4 border-primary">
+                    <span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">memory</span>
+                    <span class="text-[10px] uppercase tracking-widest">Hardware</span>
+                </div>
+            </nav>
+        </aside>
+
+        <main class="flex-1 flex flex-col min-w-0 bg-[#131313] relative">
+            <header class="flex justify-between items-center w-full px-6 h-16 border-b border-[#424754]/15">
+                <div class="text-xl font-bold tracking-tighter text-primary uppercase font-headline">JOBMAN_OS</div>
+                <div class="flex items-center gap-4">
+                    <div class="w-8 h-8 rounded-full bg-[#353534] overflow-hidden">
+                         <span class="material-symbols-outlined text-primary flex items-center justify-center h-full">person</span>
+                    </div>
+                </div>
+            </header>
+
+            <div class="flex-1 overflow-y-auto p-8">
+                <div class="max-w-6xl mx-auto space-y-12">
+                    <!-- Header -->
+                    <div class="flex flex-col md:flex-row md:items-end justify-between gap-6">
+                        <div class="space-y-2">
+                            <div class="flex items-center gap-2 text-primary font-mono text-sm tracking-widest">
+                                <span class="material-symbols-outlined text-sm">radar</span>
+                                <span>PROBE_RESULTS_ANALYZED</span>
+                            </div>
+                            <h1 class="text-5xl font-black font-headline tracking-tighter uppercase leading-none">Intelligence Probe</h1>
+                            <p class="text-on-surface-variant max-w-xl font-body">Hardware architecture mapped. Optimal model selected based on system constraints.</p>
+                        </div>
+                        <div class="flex items-center gap-4 px-6 py-4 bg-surface-container-low rounded-xl border border-outline-variant/10">
+                            <div class="text-right">
+                                <p class="text-[10px] text-on-surface-variant font-mono uppercase tracking-widest">System Tier</p>
+                                <p id="spec-tier" class="text-xl font-black font-headline text-secondary tracking-tight italic uppercase">LOADING...</p>
+                            </div>
+                            <div class="w-12 h-12 flex items-center justify-center bg-secondary/10 rounded-lg text-secondary">
+                                <span class="material-symbols-outlined text-3xl" style="font-variation-settings: 'FILL' 1;">speed</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Hardware Stats -->
+                    <div class="grid grid-cols-1 md:grid-cols-12 gap-6">
+                        <div class="md:col-span-8 glass-panel border border-outline-variant/15 rounded-2xl p-8 flex flex-col justify-between group overflow-hidden relative">
+                            <div class="relative z-10">
+                                <div class="flex justify-between items-start mb-8">
+                                    <div class="space-y-1">
+                                        <span class="text-xs font-mono text-on-surface-variant uppercase tracking-widest text-[#a8a8a8]">Primary Accelerator</span>
+                                        <h3 id="spec-gpu" class="text-3xl font-headline font-bold text-on-surface">...</h3>
+                                    </div>
+                                    <span class="bg-secondary/10 text-secondary text-[10px] font-mono px-3 py-1 rounded-full border border-secondary/20 uppercase">Stable</span>
+                                </div>
+                                <div class="grid grid-cols-2 gap-8">
+                                    <div>
+                                        <p class="text-[10px] font-mono text-on-surface-variant uppercase mb-1">VRAM_DENSITY</p>
+                                        <p id="spec-vram" class="text-2xl font-headline font-medium text-primary">0 MB</p>
+                                    </div>
+                                    <div>
+                                        <p class="text-[10px] font-mono text-on-surface-variant uppercase mb-1">RAM_CAPACITY</p>
+                                        <p id="spec-ram" class="text-2xl font-headline font-medium text-primary">0 GB</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Recommendation -->
+                        <div class="md:col-span-12 bg-[#0e0e0e] border border-primary/20 rounded-2xl p-1 flex flex-col md:flex-row items-stretch">
+                            <div class="flex-1 bg-[#201f1f] rounded-xl p-8 flex flex-col md:flex-row md:items-center gap-8">
+                                <div class="w-20 h-20 bg-primary/10 rounded-2xl flex items-center justify-center shrink-0 border border-primary/20">
+                                    <span class="material-symbols-outlined text-4xl text-primary" style="font-variation-settings: 'FILL' 1;">psychology</span>
+                                </div>
+                                <div class="space-y-1 flex-1">
+                                    <span class="text-xs font-mono text-primary uppercase tracking-tighter">Recommended Architecture</span>
+                                    <h2 id="recommended-model" class="text-3xl font-headline font-black text-on-surface tracking-tighter uppercase">...</h2>
+                                    <p class="text-sm text-on-surface-variant font-body">Selected for optimal balance of speed and reasoning.</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Modal Overrides & Footer Buttons -->
+            <div class="sticky bottom-0 left-0 right-0 bg-surface/80 backdrop-blur-md border-t border-outline-variant/10 p-6 z-20">
+                <div class="max-w-6xl mx-auto flex gap-4 justify-center">
+                    <button id="override-btn" class="px-10 py-5 border-2 border-outline-variant/50 text-gray-400 font-headline font-black rounded-xl hover:text-on-surface hover:border-primary/50 transition-all text-xs uppercase tracking-widest">Manual Override</button>
+                    <button id="use-recommended-btn" class="px-12 py-5 bg-primary text-[#002e6a] font-headline font-black rounded-xl shadow-lg shadow-primary/20 hover:opacity-90 active:scale-95 transition-all text-xs uppercase tracking-widest">Use Recommended</button>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Override Modal -->
+    <div id="modal-container" class="fixed inset-0 z-[100] hidden flex items-center justify-center bg-black/80 backdrop-blur-sm p-6">
+        <div class="bg-[#1c1b1b] border border-red-500/30 rounded-2xl max-w-xl w-full p-8 space-y-6">
+            <div class="flex items-center gap-4 text-red-400">
+                <span class="material-symbols-outlined text-4xl">warning</span>
+                <h3 class="text-2xl font-headline font-black uppercase tracking-tight">CRITICAL_WARNING</h3>
+            </div>
+            <p class="text-sm leading-relaxed text-red-200/70 border-l-2 border-red-500 pl-4 py-2">
+                Manually overriding the recommended configuration may lead to <span class="text-red-400 font-bold uppercase">system instability, extreme hardware strain, and unresponsive behavior</span>. Using non-optimized models on unsupported hardware can permanently degrade user experience. 
+            </p>
+            
+            <div class="space-y-4">
+                <p class="text-[10px] text-gray-500 uppercase tracking-widest">Select Restricted Architecture:</p>
+                <select id="model-select" class="w-full bg-[#0e0e0e] border border-[#424754] rounded-lg p-3 text-sm text-primary">
+                    <!-- Loaded via API -->
+                </select>
+            </div>
+
+            <div class="flex gap-4 pt-4">
+                <button id="cancel-modal" class="flex-1 py-4 bg-transparent border border-[#424754] text-xs font-bold uppercase tracking-widest rounded-xl hover:bg-white/5">Back to Safety</button>
+                <button id="confirm-override" class="flex-1 py-4 bg-red-600 text-white text-xs font-bold uppercase tracking-widest rounded-xl hover:bg-red-500 transition-colors">I Understand, Proceed</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let currentRecommended = "";
+
+        async function initProbe() {
+            const resp = await fetch('/api/setup/audit');
+            const data = await resp.json();
+            
+            document.getElementById('spec-tier').innerText = data.specs.tier + " TIER";
+            document.getElementById('spec-gpu').innerText = data.specs.gpu;
+            document.getElementById('spec-vram').innerText = data.specs.gpu_vram_mb + " MB";
+            document.getElementById('spec-ram').innerText = data.specs.ram_gb + " GB";
+            document.getElementById('recommended-model').innerText = data.recommended_model;
+            currentRecommended = data.recommended_model;
+
+            // Load options for override
+            const mResp = await fetch('/api/setup/models');
+            const mData = await mResp.json();
+            const select = document.getElementById('model-select');
+            mData.preselected.forEach(m => {
+                const opt = document.createElement('option');
+                opt.value = m.name;
+                opt.innerText = `${m.name} (${m.size}) - ${m.desc}`;
+                select.appendChild(opt);
+            });
+        }
+
+        async function startPull(model) {
+            await fetch('/api/setup/pull', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({model: model})
+            });
+            // New Flow: Always redirect to Environment Sync (Screen 4)
+            window.location.href = '/onboarding/sync';
+        }
+
+        document.getElementById('use-recommended-btn').addEventListener('click', () => startPull(currentRecommended));
+        document.getElementById('override-btn').addEventListener('click', () => document.getElementById('modal-container').classList.remove('hidden'));
+        document.getElementById('cancel-modal').addEventListener('click', () => document.getElementById('modal-container').classList.add('hidden'));
+        document.getElementById('confirm-override').addEventListener('click', () => {
+            const selected = document.getElementById('model-select').value;
+            startPull(selected);
+        });
+
+        window.onload = initProbe;
+    </script>
+</body>
+</html>
