@@ -115,10 +115,19 @@ class SetupManager:
         # New Step: Playwright Browser installation for the scraper
         self.update_status("Synchronizing Scraper Engine...", 18)
         try:
-            # Run playwright install -- with chromium only to save space/time
-            subprocess.run(["python", "-m", "playwright", "install", "chromium"], capture_output=True, shell=True)
+            # In frozen app, use the playwright CLI directly
+            import sys
+            if getattr(sys, 'frozen', False):
+                # Frozen app: use subprocess to call playwright's node-based installer
+                from playwright._impl._driver import compute_driver_executable
+                driver_exec = compute_driver_executable()
+                subprocess.run([str(driver_exec), "install", "chromium"], capture_output=True, timeout=300)
+            else:
+                # Dev mode: use python -m playwright
+                subprocess.run([sys.executable, "-m", "playwright", "install", "chromium"], capture_output=True, timeout=300)
             self.update_status("Scraper Engine: OPTIMAL", 20)
-        except:
+        except Exception as e:
+            logging.warning(f"Playwright install warning: {e}")
             self.update_status("Scraper Engine Warning", 20)
             
         self.update_status("Environment Verified", 22)

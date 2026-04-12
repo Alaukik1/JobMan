@@ -11,8 +11,35 @@ def build_jobman():
         if os.path.exists(folder):
             shutil.rmtree(folder)
             
-    # 2. Define PyInstaller command
-    # Use sys.executable -m PyInstaller to ensure we use the local environment
+    # 2. Locate pkg_resources for brute-force bundling
+    # Direct import fails in MS Store Python, so we find it via setuptools path
+    pkg_path = None
+    try:
+        import setuptools
+        site_packages_dir = os.path.dirname(os.path.dirname(setuptools.__file__))
+        candidate = os.path.join(site_packages_dir, 'pkg_resources')
+        if os.path.isdir(candidate):
+            pkg_path = candidate
+            print(f"📍 Located pkg_resources at: {pkg_path}")
+        else:
+            print(f"⚠️  pkg_resources folder not found at: {candidate}")
+    except ImportError:
+        pass
+    
+    if not pkg_path:
+        # Fallback: search all site-packages directories
+        import site
+        for sp in site.getsitepackages() + [site.getusersitepackages()]:
+            candidate = os.path.join(sp, 'pkg_resources')
+            if os.path.isdir(candidate):
+                pkg_path = candidate
+                print(f"📍 Located pkg_resources (fallback) at: {pkg_path}")
+                break
+    
+    if not pkg_path:
+        print("⚠️  Warning: pkg_resources not found anywhere. Build may fail on target.")
+
+    # 3. Define PyInstaller command
     sep = ';' if sys.platform == 'win32' else ':'
     
     command = [
@@ -21,10 +48,23 @@ def build_jobman():
         '--name=JobMan',
         f'--add-data=templates{sep}templates',
         f'--add-data=static{sep}static',
-        '--collect-all=chardet',   # Ensure chardet is fully included
-        '--hidden-import=chardet',
-        '--hidden-import=numpy._core', # Mandatory for NumPy 2.x on Python 3.13
     ]
+
+    # Brute-force include the pkg_resources folder if found
+    if pkg_path:
+        command.append(f'--add-data={pkg_path}{sep}pkg_resources')
+        command.append('--hidden-import=pkg_resources')
+
+    command.extend([
+        '--collect-all=setuptools',
+        '--collect-all=crawl4ai',
+        '--collect-all=playwright_stealth', # Bundle JS data files (generate.magic.arrays.js etc.)
+        '--collect-all=chardet',
+        '--copy-metadata=setuptools',
+        '--copy-metadata=crawl4ai',
+        '--hidden-import=chardet',
+        '--hidden-import=numpy._core',
+    ])
 
     # Optional assets
     if os.path.exists('config.json'):
