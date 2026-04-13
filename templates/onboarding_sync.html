@@ -146,13 +146,19 @@
 
         const evtSource = new EventSource("/api/setup/events");
 
+        let lastStatus = null;
         evtSource.onmessage = (event) => {
             const data = JSON.parse(event.data);
             
             if (data.status) {
                 statusLabel.innerText = data.status;
                 mainHeading.innerText = data.status.toUpperCase();
-                addLog(data.status, 'SYNC');
+                
+                // Only log if the status message actually changed
+                if (data.status !== lastStatus) {
+                    addLog(data.status, 'SYNC');
+                    lastStatus = data.status;
+                }
             }
 
             if (data.progress !== undefined) {

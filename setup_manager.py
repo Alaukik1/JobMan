@@ -29,9 +29,9 @@ class SetupManager:
                 return False
 
     def install_ollama(self):
-        """Execute the PowerShell installation command."""
-        # Use shell=True and start a new terminal window for visibility as requested
-        subprocess.Popen(["start", "powershell", "-NoExit", "-Command", "irm https://ollama.com/install.ps1 | iex"], shell=True)
+        # The PowerShell script downloads, installs, and then starts the Ollama app so the server becomes available
+        ps_cmd = 'irm https://ollama.com/install.ps1 | iex ; Start-Sleep -Seconds 2 ; $ollamaPath = "$env:LOCALAPPDATA\\Programs\\Ollama\\ollama.exe" ; if (Test-Path $ollamaPath) { Start-Process $ollamaPath }'
+        subprocess.Popen(["start", "powershell", "-Command", ps_cmd], shell=True)
 
     def get_hardware_specs(self) -> Dict[str, Any]:
         """Audit the system RAM and GPU."""
@@ -133,39 +133,65 @@ class SetupManager:
         self.update_status("Environment Verified", 22)
 
         # 2. Phase 2: Engine Synchronization (20-50%)
-        if not self.check_ollama_presence():
+        #    Check if Ollama's HTTP API is actually responding (not just the binary existing)
+        def is_ollama_api_alive():
+            try:
+                resp = requests.get(f"{self.ollama_base_url}/api/tags", timeout=3)
+                return resp.status_code == 200
+            except:
+                return False
+
+        if not is_ollama_api_alive():
             self.update_status("Downloading Ollama AI Engine...", 25)
             self.install_ollama()
-            # Wait for it to become alive
-            for i in range(30):
+            
+            # Wait up to 10 minutes (600s) for Ollama to fully install AND start its server
+            max_wait = 300  # 300 iterations × 2s = 10 minutes
+            for i in range(max_wait):
                 time.sleep(2)
-                if self.check_ollama_presence():
+                if is_ollama_api_alive():
                     break
-                self.update_status(f"Synchronizing Engine ({i*2}s)...", 25 + int((i/30)*20))
+                elapsed = (i + 1) * 2
+                # Progress: scale between 25% and 48% over the wait period
+                prog = 25 + min(int((elapsed / 120) * 23), 23)  # cap at 48%
+                minutes = elapsed // 60
+                seconds = elapsed % 60
+                self.update_status(f"Waiting for Ollama Engine... ({minutes}m {seconds}s)", prog)
+            else:
+                # Timed out after 10 minutes — don't fake 100%
+                self.update_status("Ollama Engine: TIMEOUT — Please install manually and restart", 25)
+                return
         
         self.update_status("Intelligence Engine: READY", 50)
 
         # 3. Phase 3: Intelligence Pull (50-95%)
-        if self.check_ollama_presence():
+        #    Only attempt if the API is actually responding
+        if is_ollama_api_alive():
             self.update_status(f"Downloading {model_name} Neural Weights...", 55)
             url = f"{self.ollama_base_url}/api/pull"
             payload = {"name": model_name, "stream": True}
             try:
-                with requests.post(url, json=payload, stream=True, timeout=900) as r:
+                with requests.post(url, json=payload, stream=True, timeout=1800) as r:
                     for line in r.iter_lines():
                         if line:
                             data = json.loads(line)
+                            status_msg = data.get("status", "")
                             if "total" in data and data.get("completed"):
                                 # Scaled between 55% and 95%
                                 prog = 55 + int((data["completed"] / data["total"]) * 40)
                                 self.update_status(f"Syncing {model_name}...", prog)
+                            elif status_msg:
+                                self.update_status(f"{model_name}: {status_msg}", 55)
             except Exception as e:
-                self.update_status(f"Sync Error: {str(e)}", 0)
+                self.update_status(f"Sync Error: {str(e)}", 50)
                 return
+        else:
+            self.update_status("Ollama API not available — skipping model pull", 50)
+            return
 
         # 4. Phase 4: Path Configuration & Finalization (95-100%)
         self.update_status("Configuring Neural Paths...", 97)
-        time.sleep(1.5) # Simulating file linking
+        time.sleep(1.5)
         self.update_status("System Handshake: SUCCESSFUL", 100)
 
 

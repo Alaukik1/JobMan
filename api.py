@@ -233,6 +233,23 @@ async def stream(request: Request):
 
 # --- Setup & Onboarding Endpoints ---
 
+@app.get("/api/setup/events")
+async def setup_events(request: Request):
+    async def event_generator():
+        while True:
+            if await request.is_disconnected():
+                break
+            with setup_manager._lock:
+                current = setup_manager._status.copy()
+            yield {
+                "event": "message",
+                "data": json.dumps(current)
+            }
+            if current.get("progress", 0) >= 100:
+                break
+            await asyncio.sleep(1)
+    return EventSourceResponse(event_generator())
+
 @app.get("/api/setup/audit")
 async def get_setup_audit():
     """Performs hardware audit and identifies recommended model."""
