@@ -179,9 +179,10 @@ class SetupManager:
                             if "total" in data and data.get("completed"):
                                 # Scaled between 55% and 95%
                                 prog = 55 + int((data["completed"] / data["total"]) * 40)
-                                self.update_status(f"Syncing {model_name}...", prog)
+                                dl_pct = int((data["completed"] / data["total"]) * 100)
+                                self.update_status(f"Downloading {model_name} — {dl_pct}%", prog)
                             elif status_msg:
-                                self.update_status(f"{model_name}: {status_msg}", 55)
+                                self.update_status(f"Downloading {model_name} — {status_msg}", 55)
             except Exception as e:
                 self.update_status(f"Sync Error: {str(e)}", 50)
                 return

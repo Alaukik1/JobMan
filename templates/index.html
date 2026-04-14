@@ -402,9 +402,9 @@
                                  ondragover="event.preventDefault(); this.classList.add('border-primary','bg-primary/10')"
                                  ondragleave="this.classList.remove('border-primary','bg-primary/10')"
                                  ondrop="handleResumeDrop(event)">
-                                <span class="material-symbols-outlined text-5xl text-outline/50 group-hover:text-primary/70 transition-all mb-3" style="font-variation-settings:'FILL' 0,'wght' 200">description</span>
-                                <p id="resume-filename" class="font-mono text-sm text-white font-bold mb-1">resume.txt</p>
-                                <p class="text-[10px] text-outline uppercase tracking-widest">Drag &amp; Drop or Browse</p>
+                                <span id="resume-icon" class="material-symbols-outlined text-5xl text-outline/50 group-hover:text-primary/70 transition-all mb-3" style="font-variation-settings:'FILL' 0,'wght' 200">upload_file</span>
+                                <p id="resume-filename" class="font-mono text-sm text-white font-bold mb-1">Click to upload resume</p>
+                                <p id="resume-hint" class="text-[10px] text-outline uppercase tracking-widest">Drag & Drop or Browse</p>
                                 <input type="file" id="resume-file-input" accept=".pdf,.docx,.doc,.odt,.txt" class="hidden" onchange="uploadResume(this.files[0])">
                             </div>
 
@@ -1342,7 +1342,7 @@
         try {
             const r = await fetch('/api/resume');
             const d = await r.json();
-            if (d.exists && d.chars > 0) {
+            if (d.exists && d.chars > 20) {
                 _resumeText = d.text;
                 setResumeLoaded(d.filename || 'resume.txt', d.chars);
             } else {
@@ -1352,7 +1352,9 @@
     }
 
     function setResumeLoaded(filename, chars) {
+        document.getElementById('resume-icon').innerText = 'description';
         document.getElementById('resume-filename').innerText = filename;
+        document.getElementById('resume-hint').innerText = 'Click to replace';
         document.getElementById('resume-status-dot').className = 'w-2 h-2 rounded-full bg-secondary';
         document.getElementById('resume-status-text').innerText = 'Content: RESUME_FM_PROFILE.TXT';
         document.getElementById('resume-status-text').className = 'text-[11px] font-mono text-secondary uppercase tracking-widest';
@@ -1365,7 +1367,9 @@
 
     function setResumeEmpty() {
         _resumeText = '';
-        document.getElementById('resume-filename').innerText = 'No file loaded';
+        document.getElementById('resume-icon').innerText = 'upload_file';
+        document.getElementById('resume-filename').innerText = 'Click to upload resume';
+        document.getElementById('resume-hint').innerText = 'Drag & Drop or Browse';
         document.getElementById('resume-status-dot').className = 'w-2 h-2 rounded-full bg-outline';
         document.getElementById('resume-status-text').innerText = 'Not loaded';
         document.getElementById('resume-status-text').className = 'text-[11px] font-mono text-outline uppercase tracking-widest';
